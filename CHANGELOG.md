@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Test APK surumu `1.0.16-test.1` olarak ayrildi; Android `versionCode` 17 / `versionName` 1.0.16-test.1 yapildi.
+- Giris ekranina gorunur `Test APK v1.0.16` etiketi eklendi; boylece telefonda eski/yeni APK karisikligi kontrol edilebilir hale geldi.
+- Eski telefon verisi yeni test surumune gecince hazir admin/koc/danisan hesaplarini koruyacak migration eklendi.
 - Vitest ve ESLint tabanli ilk test/lint altyapisi eklendi.
 - Program atama, gunluk gorev, mesajlasma ve dashboard selectorlari icin temel unit/smoke testleri eklendi.
 - Test komutlari ve kapsam aciklamasi `docs/TESTING.md` icinde belgelendi.

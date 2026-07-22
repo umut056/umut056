@@ -88,6 +88,8 @@ import { estimateBody, measuresOf } from "./shared/lib/wellness.js";
 import { C, F } from "./shared/theme/tokens.js";
 import { Card, Ico, Pill, buttonStyle, controlStyle, inputShellStyle } from "./shared/ui/primitives.jsx";
 
+const APP_TEST_BUILD = "Test APK v1.0.16 · 22.07.2026";
+
 const isCloudId = (value = "") => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 
 const BANNED_FOODS = ["Sucuk", "Salam", "Pilav", "Makarna", "Beyaz ekmek", "Kızartma", "Hamur işi", "Pişmiş havuç", "Paketli gıda", "Patates", "Şekerli gıdalar", "Nescafe", "Mısır"];
@@ -232,9 +234,35 @@ const DB = {
   get:(k)=>{ try{return JSON.parse(localStorage.getItem("ct_"+k));}catch{return null;} },
   set:(k,v)=>{ try{localStorage.setItem("ct_"+k,JSON.stringify(v));}catch{} },
   init:()=>{
-    const seedVersion="stepwise-v11-test-clean";
-    if(!DB.get("users")||DB.get("seedVersion")!==seedVersion){
+    const seedVersion="stepwise-v12-visible-test-apk";
+    const storedUsers=DB.get("users");
+    const storedVersion=DB.get("seedVersion");
+    if(!storedUsers){
       DB.set("users",SEED_USERS); DB.set("msgs",SEED_MSGS); DB.set("sess",SEED_SESS); DB.set("taskLogs",[]); DB.set("auditLogs",[]); DB.set("seeded",true);
+    }else if(storedVersion!==seedVersion){
+      const byId=new Map(storedUsers.map(u=>[u.id,u]));
+      const mergedSeeds=SEED_USERS.map(seed=>({
+        ...seed,
+        ...(byId.get(seed.id)||{}),
+        role:seed.role,
+        email:seed.email,
+        password:byId.get(seed.id)?.password||seed.password,
+        passwordHash:byId.get(seed.id)?.passwordHash,
+        status:byId.get(seed.id)?.status||seed.status,
+      }));
+      const customUsers=storedUsers.filter(u=>!SEED_USERS.some(seed=>seed.id===u.id));
+      DB.set("users",[...mergedSeeds,...customUsers]);
+      const existingMsgs=DB.get("msgs")||[];
+      const seenMsgs=new Set();
+      DB.set("msgs",[...SEED_MSGS,...existingMsgs].filter(m=>{
+        const id=m.id||`${m.from}-${m.to}-${m.date}-${m.time}-${m.text}`;
+        if(seenMsgs.has(id))return false;
+        seenMsgs.add(id);
+        return true;
+      }));
+      if(!DB.get("sess"))DB.set("sess",SEED_SESS);
+      if(!DB.get("taskLogs"))DB.set("taskLogs",[]);
+      if(!DB.get("auditLogs"))DB.set("auditLogs",[]);
     }
     if(!DB.get("msgs"))DB.set("msgs",SEED_MSGS);
     if(!DB.get("sess"))DB.set("sess",SEED_SESS);
@@ -697,6 +725,7 @@ const LoginScreen=({onLogin,onRegister})=>{
         {isDemoAccountsEnabled()&&<div style={{marginTop:24,background:C.foam,borderRadius:14,padding:"14px 16px",border:`1px solid ${C.mint}`,fontSize:12,color:C.stone,lineHeight:1.5,...F}}>
           Test sürecinde yukarıdaki kayıtlı hesaplarla admin, koç ve danışan ekranlarını hızlıca kontrol edebilirsin.
         </div>}
+        <div style={{marginTop:10,textAlign:"center",fontSize:10,fontWeight:900,color:"rgba(13,61,43,.48)",...F}}>{APP_TEST_BUILD}</div>
       </div>
     </div>
   );
