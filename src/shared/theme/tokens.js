@@ -1,0 +1,26 @@
+export const C = {
+  forest: "#0d3d2b",
+  emerald: "#1a6645",
+  jade: "#25a874",
+  mint: "#d4f0e4",
+  foam: "#f0faf5",
+  mist: "linear-gradient(180deg,rgba(247,252,249,.94),rgba(236,248,242,.9)), url('/login-wellness-bg.png') center top / cover fixed no-repeat",
+  stone: "#8aa89a",
+  pebble: "#c4d6cc",
+  white: "#ffffff",
+  ink: "#0a1f16",
+  risk: "#d94f3d",
+  warn: "#e8a020",
+  gold: "#f5c842",
+  blue: "#3b7dd8",
+  blueBg: "#eef6ff",
+  purple: "#7c5cbf",
+  purpleBg: "#f3eeff",
+  adk: "#0f172a",
+  adc: "#1e293b",
+  adb: "#334155",
+  adt: "#e2e8f0",
+  adm: "#94a3b8",
+};
+
+export const F = { fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" };

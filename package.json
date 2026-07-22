@@ -1,0 +1,30 @@
+{
+  "name": "stepwise-plus",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "build:production": "vite build --mode production",
+    "doctor:production": "node scripts/production-doctor.mjs",
+    "supabase:functions:deploy": "supabase functions deploy admin-create-user && supabase functions deploy coach-create-client && supabase functions deploy admin-import-workspace && supabase functions deploy notify-user",
+    "supabase:db:push": "supabase db push",
+    "supabase:status": "supabase status",
+    "android:sync": "cap sync android",
+    "android:apk": "cd android && gradlew.bat assembleDebug",
+    "android:apk:release": "cd android && gradlew.bat assembleRelease",
+    "android:aab:release": "cd android && gradlew.bat bundleRelease"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.2.1",
+    "@capacitor/core": "^6.2.1",
+    "@vitejs/plugin-react": "^5.1.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "vite": "^7.2.4"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.1"
+  }
+}

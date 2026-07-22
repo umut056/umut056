@@ -1,0 +1,51 @@
+# Changelog
+
+## Unreleased
+
+- Master specification paketi icin `docs/MASTER_SPEC_INDEX.md`, `docs/API_MASTER_SPECIFICATION.md`, `docs/UI_UX_MASTER_SPECIFICATION.md`, `docs/AI_MASTER_SPECIFICATION.md`, `docs/BUSINESS_RULES_MASTER.md`, `docs/TEST_MASTER.md` ve `docs/DEPLOYMENT_MASTER.md` eklendi.
+- Tam proje denetimi icin `PROJECT_AUDIT_REPORT.md` olusturuldu.
+- Yayin oncesi kalite, guvenlik, KVKK/GDPR, store ve CI/CD kontrolleri icin `GO_LIVE_CHECKLIST.md` olusturuldu.
+- StepWise Plus V2 master contract kapsaminda refactor akisi baslatildi.
+- Ortak renk ve font tokenlari `src/shared/theme/tokens.js` altina tasindi.
+- `Card`, `Pill` ve `Ico` primitive componentleri `src/shared/ui/primitives.jsx` altina tasindi.
+- Isim kisa gosterimi, gun hesabi, kilo degisimi ve rozet helperlari `src/shared/lib/format.js` altina tasindi.
+- Vucut tahmini ve program olcu etiketi helperlari `src/shared/lib/wellness.js` altina tasindi.
+- IndexedDB medya saklama, cloud medya upload ve signed URL yenileme islemleri `src/features/media/mediaService.js` altina tasindi.
+- Medya gosterim componentleri `src/features/media/mediaComponents.jsx` altina tasindi.
+- Mesaj kaydi olusturma akisi `src/features/messages/messageService.js` altina tasindi.
+- Login, sifre hashleme ve Supabase profil mapleme akisi `src/features/auth/authService.js` altina tasindi.
+- Kayitli oturum geri yukleme akisi `src/features/auth/sessionService.js` altina tasindi.
+- Cloud workspace kullanici normalize etme ve mesaj birlestirme akisi `src/features/sync/workspaceService.js` altina tasindi.
+- Koc ozet dashboard metrikleri `src/features/dashboard/dashboardSelectors.js` altina tasindi.
+- Danisan ozet dashboard metrikleri `src/features/dashboard/dashboardSelectors.js` altina tasindi.
+- Profil guncelleme patch akisi `src/features/profile/profileService.js` altina tasindi.
+- Kilo guncelleme ve kilo log modeli `src/features/weight/weightService.js` altina tasindi.
+- Vucut olcumu varsayilanlari ve tahmin uygulama modeli `src/features/measurements/measurementService.js` altina tasindi.
+- Progress photo onay listesi ve kanit durum guncelleme modeli `src/features/photos/proofService.js` altina tasindi.
+- Gunluk gorev state ve kullanici merge modeli `src/features/tasks/dailyTaskService.js` altina tasindi.
+- Bildirim, okunmamis mesaj ve koc notu durum helperlari `src/features/notifications/notificationService.js` altina tasindi.
+- Gorev alarm planlama, gecikme kontrolu ve alarm izin uyarilari `src/features/tasks/taskAlarmService.js` altina tasindi.
+- Web bildirim metinlerindeki bozuk Turkce karakterler temizlendi.
+- Program katalogu, atama secicileri, atomlu/atomsuz dongu normalizasyonu ve program gorunum helperlari `src/features/programs/programService.js` altina tasindi.
+- Program atama sonucu olusan danisan patch modeli `buildAssignedProgramClient` ile tek noktaya alindi.
+- Yeni danisan varsayilan profil modeli ve koca baglama helperi `src/features/clients/clientService.js` altina tasindi.
+- Mesaj konusma filtreleme, oda mesajlari ve mesaj onizleme metni `src/features/messages/messageService.js` altina tasindi.
+- Mesaj foto/ses medya draft olusturma akisi `src/features/messages/messageService.js` icinde tek fonksiyona indirildi.
+- Mesaj okundu isaretleme ve cloud read senkron orkestrasyonu `src/features/messages/messageService.js` altina tasindi.
+- Takvim hafta hesaplama, seans filtreleme ve randevu taslak/notice modelleri `src/features/calendar/appointmentService.js` altina tasindi.
+- Koc rapor metrikleri, trend barlari, task log filtreleri ve siralama selectorlari `src/features/reports/reportSelectors.js` altina tasindi.
+- Danisan ilerleme body varsayilanlari, haftalik barlari ve aylik siralama selectorlari `src/features/reports/reportSelectors.js` altina tasindi.
+- Ortak form kontrol ve mesaj input shell stilleri `src/shared/ui/primitives.jsx` altina tasindi.
+- Ortak primary/soft/mint/danger button style helperi `src/shared/ui/primitives.jsx` altina eklendi ve randevu formlarinda kullanilmaya baslandi.
+- Register form temizleme, temel dogrulama, lokal koc/danisan kayit modeli ve production kayit payload akisi `src/features/auth/authService.js` altina tasindi.
+- Register ekranindaki input ve ana aksiyon butonu ortak `controlStyle`/`buttonStyle` helperlari ile hizalandi.
+- Profil bilgileri ve guvenlik form alanlari ortak `controlStyle`/`buttonStyle` helperlari ile hizalandi.
+- Proje karar, kalite, release ve autonomous development kurallari `PROJECT_GOVERNANCE.md` dosyasinda belgelendi.
+- V2 uzun vadeli veritabani domainleri, 170 tablolu master katalog, iliskiler ve migration sirasi `docs/DATABASE_MASTER_SCHEMA.md` dosyasinda tanimlandi.
+- V2 design system, component library, icon, animation, loading, empty ve error state standardi `docs/DESIGN_SYSTEM_MASTER_SPECIFICATION.md` dosyasinda tanimlandi.
+- Offline mode, sync engine, cache, storage, search, notification, scheduler, permission, multi-tenant ve event-driven architecture `docs/PLATFORM_SYSTEMS_MASTER_SPECIFICATION.md` dosyasinda tanimlandi.
+- AI memory/persona, gamification, community, education, CRM ve marketplace urun modulleri `docs/PRODUCT_MODULES_MASTER_SPECIFICATION.md` dosyasinda tanimlandi.
+- DDD, design token sistemi, feature toggle, remote config, plugin, AI orchestrator, workflow, rule, formula, recommendation engine, audit, versioning, health score, prediction, risk, digital twin, prompt versioning, experiment ve event bus mimarisi `docs/ARCHITECTURE_MASTER_SPECIFICATION.md` dosyasinda tanimlandi.
+- User story, acceptance criteria, Definition of Done, feature backlog, release plan, QA checklist, KVKK/GDPR ve operasyon standartlari `docs/PRODUCT_DELIVERY_MASTER_SPECIFICATION.md` dosyasinda tanimlandi.
+- V2 uygulanabilir sozlesme katmani icin `docs/DATABASE_SCHEMA.sql`, `docs/OPENAPI.yaml`, `docs/FIGMA_DESIGN_SPEC.md`, `docs/AI_PROMPTS.md`, `docs/NOTIFICATION_SCENARIOS.md`, `docs/BUSINESS_RULES.md`, `docs/FORMULA_ENGINE.md` ve `docs/REPORT_TEMPLATES.md` eklendi.
+- README ve ROADMAP dosyalari V2 calisma kurallarina gore baslatildi.

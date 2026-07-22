@@ -1,0 +1,587 @@
+openapi: 3.1.0
+info:
+  title: StepWise Plus API
+  version: 1.0.0
+  description: >
+    Production API contract for StepWise Plus V2. Supabase REST and Edge
+    Functions remain the implementation base; this file defines the stable
+    public contract used by web, Android and future clients.
+servers:
+  - url: https://{projectRef}.supabase.co
+    description: Supabase project
+    variables:
+      projectRef:
+        default: zbjdwstdbxujwpvrnzmb
+security:
+  - bearerAuth: []
+tags:
+  - name: Auth
+  - name: Profiles
+  - name: Coaches
+  - name: Clients
+  - name: Programs
+  - name: Tasks
+  - name: Tracking
+  - name: Messages
+  - name: Appointments
+  - name: Media
+  - name: Notifications
+  - name: Reports
+  - name: AI
+  - name: Admin
+paths:
+  /functions/v1/admin-create-user:
+    post:
+      tags: [Admin]
+      summary: Create a coach, client or admin user
+      operationId: adminCreateUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminCreateUserRequest"
+      responses:
+        "200":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /functions/v1/coach-create-client:
+    post:
+      tags: [Coaches, Clients]
+      summary: Create a client under the authenticated coach
+      operationId: coachCreateClient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CoachCreateClientRequest"
+      responses:
+        "200":
+          description: Client created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileResponse"
+  /functions/v1/admin-import-workspace:
+    post:
+      tags: [Admin]
+      summary: Import legacy/local workspace data into cloud
+      operationId: adminImportWorkspace
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        "200":
+          description: Import summary
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: integer
+                  programs:
+                    type: integer
+                  appointments:
+                    type: integer
+                  messages:
+                    type: integer
+  /functions/v1/notify-user:
+    post:
+      tags: [Notifications]
+      summary: Send a push/in-app notification to a user
+      operationId: notifyUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationRequest"
+      responses:
+        "200":
+          description: Notification queued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MutationResponse"
+  /rest/v1/profiles:
+    get:
+      tags: [Profiles]
+      summary: List profiles visible to current user
+      operationId: listProfiles
+      responses:
+        "200":
+          description: Profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Profile"
+    patch:
+      tags: [Profiles]
+      summary: Patch profile fields
+      operationId: patchProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfilePatch"
+      responses:
+        "204":
+          description: Updated
+  /rest/v1/programs:
+    get:
+      tags: [Programs]
+      summary: List global and coach programs
+      operationId: listPrograms
+      responses:
+        "200":
+          description: Programs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Program"
+    post:
+      tags: [Programs]
+      summary: Create coach program
+      operationId: createProgram
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProgramInput"
+      responses:
+        "201":
+          description: Created
+  /rest/v1/client_programs:
+    post:
+      tags: [Programs, Clients]
+      summary: Assign program to client
+      operationId: assignProgram
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClientProgramInput"
+      responses:
+        "201":
+          description: Assigned
+  /rest/v1/daily_task_status:
+    get:
+      tags: [Tasks]
+      summary: List daily task state
+      operationId: listDailyTaskStatus
+      responses:
+        "200":
+          description: Daily task state
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DailyTaskStatus"
+    post:
+      tags: [Tasks]
+      summary: Upsert daily task status
+      operationId: upsertDailyTaskStatus
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DailyTaskStatusInput"
+      responses:
+        "201":
+          description: Upserted
+  /rest/v1/body_metrics:
+    get:
+      tags: [Tracking]
+      summary: List body metrics
+      operationId: listBodyMetrics
+      responses:
+        "200":
+          description: Body metrics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BodyMetrics"
+    post:
+      tags: [Tracking]
+      summary: Create body metrics entry
+      operationId: createBodyMetrics
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BodyMetricsInput"
+      responses:
+        "201":
+          description: Created
+  /rest/v1/messages:
+    get:
+      tags: [Messages]
+      summary: List scoped messages
+      operationId: listMessages
+      responses:
+        "200":
+          description: Messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
+    post:
+      tags: [Messages]
+      summary: Send message
+      operationId: sendMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageInput"
+      responses:
+        "201":
+          description: Sent
+  /rest/v1/appointments:
+    get:
+      tags: [Appointments]
+      summary: List appointments
+      operationId: listAppointments
+      responses:
+        "200":
+          description: Appointments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Appointment"
+    post:
+      tags: [Appointments]
+      summary: Create appointment request or coach slot
+      operationId: createAppointment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AppointmentInput"
+      responses:
+        "201":
+          description: Created
+  /rest/v1/reports:
+    get:
+      tags: [Reports]
+      summary: List report snapshots
+      operationId: listReports
+      responses:
+        "200":
+          description: Reports
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Report"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    Unauthorized:
+      description: Missing or invalid session
+    Forbidden:
+      description: Role or policy denied access
+  schemas:
+    MutationResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        id:
+          type: string
+          format: uuid
+        message:
+          type: string
+    Profile:
+      type: object
+      required: [id, role, name, email]
+      properties:
+        id:
+          type: string
+          format: uuid
+        role:
+          type: string
+          enum: [admin, coach, client]
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        status:
+          type: string
+          enum: [active, banned, deleted]
+        coach_id:
+          type: string
+          format: uuid
+        ref_code:
+          type: string
+    ProfilePatch:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        status:
+          type: string
+        avatar_media:
+          type: object
+          additionalProperties: true
+    ProfileResponse:
+      type: object
+      properties:
+        profile:
+          $ref: "#/components/schemas/Profile"
+    AdminCreateUserRequest:
+      type: object
+      required: [role, name, email, password]
+      properties:
+        role:
+          type: string
+          enum: [admin, coach, client]
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        coach_id:
+          type: string
+          format: uuid
+    CoachCreateClientRequest:
+      type: object
+      required: [name, email, password]
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        start_date:
+          type: string
+          format: date
+        target_date:
+          type: string
+          format: date
+    Program:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        coach_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        duration_days:
+          type: integer
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProgramTask"
+    ProgramInput:
+      type: object
+      required: [name, duration_days]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        duration_days:
+          type: integer
+        product_video:
+          type: object
+          additionalProperties: true
+    ProgramTask:
+      type: object
+      properties:
+        title:
+          type: string
+        scheduled_time:
+          type: string
+        section:
+          type: string
+        photo_required:
+          type: boolean
+        repeat_rule:
+          type: object
+          additionalProperties: true
+    ClientProgramInput:
+      type: object
+      required: [client_id, coach_id, program_id, start_date]
+      properties:
+        client_id:
+          type: string
+          format: uuid
+        coach_id:
+          type: string
+          format: uuid
+        program_id:
+          type: string
+          format: uuid
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+    DailyTaskStatus:
+      type: object
+      properties:
+        client_id:
+          type: string
+          format: uuid
+        task_date:
+          type: string
+          format: date
+        completed:
+          type: boolean
+        proof_media:
+          type: object
+    DailyTaskStatusInput:
+      allOf:
+        - $ref: "#/components/schemas/DailyTaskStatus"
+    BodyMetrics:
+      type: object
+      properties:
+        client_id:
+          type: string
+          format: uuid
+        height_cm:
+          type: number
+        current_weight:
+          type: number
+        target_weight:
+          type: number
+        body_fat_estimate:
+          type: number
+    BodyMetricsInput:
+      allOf:
+        - $ref: "#/components/schemas/BodyMetrics"
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sender_id:
+          type: string
+          format: uuid
+        receiver_id:
+          type: string
+          format: uuid
+        content:
+          type: string
+        media_type:
+          type: string
+        read_at:
+          type: string
+          format: date-time
+    MessageInput:
+      type: object
+      required: [sender_id, receiver_id]
+      properties:
+        sender_id:
+          type: string
+          format: uuid
+        receiver_id:
+          type: string
+          format: uuid
+        content:
+          type: string
+        media_storage_path:
+          type: string
+        media_type:
+          type: string
+    Appointment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        coach_id:
+          type: string
+          format: uuid
+        client_id:
+          type: string
+          format: uuid
+        date:
+          type: string
+          format: date
+        time:
+          type: string
+        status:
+          type: string
+    AppointmentInput:
+      allOf:
+        - $ref: "#/components/schemas/Appointment"
+    NotificationRequest:
+      type: object
+      required: [user_id, title, body]
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        body:
+          type: string
+        data:
+          type: object
+          additionalProperties: true
+    Report:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+        payload:
+          type: object
+          additionalProperties: true
+
