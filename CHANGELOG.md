@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Vitest ve ESLint tabanli ilk test/lint altyapisi eklendi.
+- Program atama, gunluk gorev, mesajlasma ve dashboard selectorlari icin temel unit/smoke testleri eklendi.
+- Test komutlari ve kapsam aciklamasi `docs/TESTING.md` icinde belgelendi.
 - Master specification paketi icin `docs/MASTER_SPEC_INDEX.md`, `docs/API_MASTER_SPECIFICATION.md`, `docs/UI_UX_MASTER_SPECIFICATION.md`, `docs/AI_MASTER_SPECIFICATION.md`, `docs/BUSINESS_RULES_MASTER.md`, `docs/TEST_MASTER.md` ve `docs/DEPLOYMENT_MASTER.md` eklendi.
 - Tam proje denetimi icin `PROJECT_AUDIT_REPORT.md` olusturuldu.
 - Yayin oncesi kalite, guvenlik, KVKK/GDPR, store ve CI/CD kontrolleri icin `GO_LIVE_CHECKLIST.md` olusturuldu.

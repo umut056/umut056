@@ -16,9 +16,14 @@ Bu repository sifirdan yazilmayacak. Calisan ozellikler korunacak, tekrar eden k
 ## Komutlar
 
 ```bash
+npm run lint
+npm test
+npm run smoke
 npm run build
 npm run doctor:production
 ```
+
+Test detaylari icin `docs/TESTING.md` dosyasina bak.
 
 ## Master Specifications
 
@@ -37,6 +42,7 @@ npm run doctor:production
 - `docs/BUSINESS_RULES.md`: Authentication, role, program, task, messaging, calendar, admin ve AI is kurallari.
 - `docs/FORMULA_ENGINE.md`: BMI, kilo degisimi, milestone, su, protein ve health score hesaplama sozlesmesi.
 - `docs/REPORT_TEMPLATES.md`: Danisan, koc, admin, AI rapor ve export sablonlari.
+- `docs/TESTING.md`: Unit, smoke, lint ve release test komutlari.
 
 ## Mevcut Durum
 
