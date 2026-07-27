@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Staging Supabase RLS capraz rol dogrulamasi icin `npm run test:rls:staging` eklendi; admin, koc ve danisan JWT senaryolari PASS olarak belgelendi.
+
 - Test APK surumu `1.0.16-test.1` olarak ayrildi; Android `versionCode` 17 / `versionName` 1.0.16-test.1 yapildi.
 - Giris ekranina gorunur `Test APK v1.0.16` etiketi eklendi; boylece telefonda eski/yeni APK karisikligi kontrol edilebilir hale geldi.
 - Eski telefon verisi yeni test surumune gecince hazir admin/koc/danisan hesaplarini koruyacak migration eklendi.

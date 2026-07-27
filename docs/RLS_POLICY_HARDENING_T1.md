@@ -36,7 +36,7 @@ This document records the T1 security foundation change from the Codex work inst
 
 ## Notes
 
-- T2 must verify these policies against staging Supabase with real anon key + role JWTs.
+- T2 verified these policies against staging Supabase with real anon key + role JWTs.
 - Storage object policy hardening is already present in the base schema and remains compatible with this table-level migration.
 
 ## Verification
@@ -48,4 +48,4 @@ This document records the T1 security foundation change from the Codex work inst
 ## Status
 
 - [x] T1 - Supabase RLS policies hardened in a new migration.
-- [ ] T2 - Staging role/JWT verification still requires live Supabase test credentials.
+- [x] T2 - Staging role/JWT verification passed with `npm run test:rls:staging`.

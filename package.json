@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "smoke": "vitest run src/features/app.smoke.test.js",
     "doctor:production": "node scripts/production-doctor.mjs",
+    "test:rls:staging": "node scripts/seed-and-verify-rls.mjs",
     "supabase:functions:deploy": "supabase functions deploy admin-create-user && supabase functions deploy coach-create-client && supabase functions deploy admin-import-workspace && supabase functions deploy notify-user",
     "supabase:db:push": "supabase db push",
     "supabase:status": "supabase status",
