@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Gorev alarm kurallari icin aktif gorev, erteleme, 5 dakika gecikme toleransi ve izin uyarilari regression testleri eklendi.
+
 - Program lifecycle kurallari servis katmanina tasindi: koca ozel kopya, gorev satiri parse, ozel program silme ve sistem sablonu gizleme testlendi.
 
 - Android gorev alarmlari v7 kanalina tasindi; kilit ekraninda daha belirgin titresim ve 1 dakikalik tekrar davranisi eklendi.
