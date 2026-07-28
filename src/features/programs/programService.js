@@ -24,6 +24,83 @@ export function uniquePrograms(programs = []) {
   });
 }
 
+export function editableProgramForCoach(program = {}, coachId) {
+  if (!program?.id || !coachId) return { ...program };
+  if (program.coachId === coachId) return { ...program };
+  return {
+    ...program,
+    id: `cp-${coachId}-${program.id}`,
+    coachId,
+    variantNote: "Ozel",
+    sourceTemplateId: program.id,
+  };
+}
+
+export function programTasksToRows(tasks = []) {
+  return tasks
+    .map((task) => [task.title, task.scheduledTime, task.section, task.note].filter(Boolean).join(" | "))
+    .join("\n");
+}
+
+export function parseProgramTaskRows(text = "", fallbackTasks = []) {
+  const tasks = String(text)
+    .split("\n")
+    .map((line) => {
+      const [title, time, section, note] = line.split("|").map((part) => (part || "").trim());
+      if (!title) return null;
+      return {
+        title,
+        type: "meal",
+        section: section || "Genel",
+        scheduledTime: time || "09:00",
+        repeatType: "daily",
+        repeatDays: [1, 2, 3, 4, 5, 6, 7],
+        buttonLabel: "Fotoğraf Ekle",
+        photoRequired: true,
+        snoozeEnabled: true,
+        snoozeOptions: [15, 30, 60],
+        note: note || title,
+      };
+    })
+    .filter(Boolean);
+
+  return normalizeProgramTasksForCycle(tasks.length ? tasks : fallbackTasks.map((task) => ({ ...task })));
+}
+
+export function buildProgramRemovalState({ program, programs = [], users = [], coachId }) {
+  if (!program?.id || !coachId) return { programs, users };
+
+  if (program.coachId !== coachId) {
+    return {
+      programs,
+      users: users.map((user) =>
+        user.id === coachId
+          ? { ...user, hiddenProgramIds: [...new Set([...(user.hiddenProgramIds || []), program.id])] }
+          : user,
+      ),
+    };
+  }
+
+  return {
+    programs: programs.filter((item) => item.id !== program.id),
+    users: users.map((user) =>
+      user.programTemplateId === program.id
+        ? {
+            ...user,
+            program: UNASSIGNED_PROGRAM,
+            programTemplateId: "",
+            programDraft: null,
+            tasks: [],
+            pendingToday: 0,
+            photoPendingToday: 0,
+            missedToday: 0,
+            compliance: 0,
+          }
+        : user,
+    ),
+  };
+}
+
 export function hiddenProgramIdsFor(users = [], coachId) {
   return new Set((users.find((user) => user.id === coachId)?.hiddenProgramIds || []).filter(Boolean));
 }

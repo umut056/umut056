@@ -37,6 +37,7 @@ npm run doctor:production
 ## Su Anda Kapsanan Alanlar
 
 - Program listesi tekillestirme
+- Program lifecycle: sistem sablonunu koca ozel kopyalama, satir parse etme, silme ve gizleme kurallari
 - Program atama modeli
 - 3 gun atomlu / 2 gun atomsuz gorev dongusu normalizasyonu
 - Program videosunun atamaya eklenmesi

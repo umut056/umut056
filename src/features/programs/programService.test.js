@@ -1,8 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
   buildAssignedProgramClient,
+  buildProgramRemovalState,
   displayProgram,
+  editableProgramForCoach,
   normalizeProgramTasksForCycle,
+  parseProgramTaskRows,
+  programTasksToRows,
   programVideoForAssignment,
   uniquePrograms,
   UNASSIGNED_PROGRAM,
@@ -78,5 +82,71 @@ describe("programService", () => {
       sourceProgramName: "Video Program",
     });
   });
-});
 
+  it("creates an editable coach-owned copy of a system template", () => {
+    const editable = editableProgramForCoach(
+      { id: "system-4", name: "4 Temel Program", tasks: [{ title: "Sabah" }] },
+      "coach-1",
+    );
+
+    expect(editable).toMatchObject({
+      id: "cp-coach-1-system-4",
+      coachId: "coach-1",
+      sourceTemplateId: "system-4",
+      variantNote: "Ozel",
+    });
+  });
+
+  it("serializes and parses editable program task rows", () => {
+    const rows = programTasksToRows([
+      { title: "Atomlu kahvalti", scheduledTime: "07:15", section: "Kahvalti", note: "500 ml su" },
+      { title: "Ogle yemegi", scheduledTime: "12:30", section: "Ana Ogun" },
+    ]);
+    const parsed = parseProgramTaskRows(rows);
+
+    expect(rows).toContain("Atomlu kahvalti | 07:15 | Kahvalti | 500 ml su");
+    expect(parsed[0]).toMatchObject({
+      title: "Atomlu kahvalti",
+      scheduledTime: "07:15",
+      section: "Kahvalti",
+      photoRequired: true,
+      repeatType: "cycle",
+      cycleLength: 5,
+      cycleDays: [0, 1, 2],
+    });
+    expect(parsed[1]).toMatchObject({ title: "Ogle yemegi", scheduledTime: "12:30", repeatType: "daily" });
+  });
+
+  it("removes coach programs and unassigns affected clients", () => {
+    const state = buildProgramRemovalState({
+      program: { id: "custom-1", coachId: "coach-1", name: "Ozel Program" },
+      programs: [{ id: "custom-1", coachId: "coach-1" }, { id: "other", coachId: "coach-1" }],
+      users: [
+        { id: "coach-1", role: "coach" },
+        { id: "client-1", role: "client", coachId: "coach-1", programTemplateId: "custom-1", program: "Ozel Program", tasks: [true], compliance: 75 },
+      ],
+      coachId: "coach-1",
+    });
+
+    expect(state.programs.map((program) => program.id)).toEqual(["other"]);
+    expect(state.users.find((user) => user.id === "client-1")).toMatchObject({
+      program: UNASSIGNED_PROGRAM,
+      programTemplateId: "",
+      tasks: [],
+      pendingToday: 0,
+      compliance: 0,
+    });
+  });
+
+  it("hides system templates for a coach instead of deleting them", () => {
+    const state = buildProgramRemovalState({
+      program: { id: "system-1", name: "6 Temel Program" },
+      programs: [{ id: "system-1" }],
+      users: [{ id: "coach-1", role: "coach", hiddenProgramIds: ["old"] }],
+      coachId: "coach-1",
+    });
+
+    expect(state.programs).toEqual([{ id: "system-1" }]);
+    expect(state.users[0].hiddenProgramIds).toEqual(["old", "system-1"]);
+  });
+});
