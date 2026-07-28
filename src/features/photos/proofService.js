@@ -1,13 +1,15 @@
 const localTime = () =>
   new Date().toLocaleTimeString("tr", { hour: "2-digit", minute: "2-digit" });
 
+const asArray = (value) => (Array.isArray(value) ? value : []);
+
 export function getCoachProofActions({
   coachId,
   users = [],
   getTaskPlan = () => [],
   todayKey,
 }) {
-  return users
+  return asArray(users)
     .filter((user) => user?.role === "client" && user.coachId === coachId)
     .flatMap((client) => {
       const plan = getTaskPlan(client);
@@ -40,7 +42,7 @@ export function applyCoachProofStatus({
 }) {
   let taskTitle = "Fotoğraf kanıtı";
 
-  const nextUsers = users.map((user) => {
+  const nextUsers = asArray(users).map((user) => {
     if (user.id !== clientId) return user;
 
     const day = user.dailyTasks?.[todayKey] || {

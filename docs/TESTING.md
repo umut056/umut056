@@ -45,6 +45,7 @@ npm run doctor:production
 - Yeni gunde gorev state sifirlama
 - Gunluk compliance ve bekleyen gorev hesaplama
 - Gorev alarm kurallari: aktif gorev filtresi, erteleme onceligi, 5 dakika gecikme toleransi ve izin uyarilari
+- Koc fotograf onay kuyrugu: kapsam filtresi, danisan notu, onay/red/gizleme ve log olusturma
 - Koc-danisan mesaj filtresi
 - Grup/oda mesaj siralama
 - Mesaj onizleme metni

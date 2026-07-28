@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Koc fotograf onay kuyrugu kapsam filtresi, danisan notu, onay/red/gizleme ve log olusturma testleriyle guvenceye alindi.
+
 - Profil patch servisi offline/local kayit, cloud merge, cloud hata fallback ve eksik id durumlari icin regression testleriyle guvenceye alindi.
 
 - Gorev alarm kurallari icin aktif gorev, erteleme, 5 dakika gecikme toleransi ve izin uyarilari regression testleri eklendi.
