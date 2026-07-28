@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Local/demo auth sifre saklama PBKDF2 tabanli tuzlu hash formatina tasindi; eski SHA/plain kayitlar basarili giriste otomatik migrate ediliyor ve production auth hatasinda local fallback kapatildi.
+
 - Staging Supabase RLS capraz rol dogrulamasi icin `npm run test:rls:staging` eklendi; admin, koc ve danisan JWT senaryolari PASS olarak belgelendi.
 
 - Test APK surumu `1.0.16-test.1` olarak ayrildi; Android `versionCode` 17 / `versionName` 1.0.16-test.1 yapildi.

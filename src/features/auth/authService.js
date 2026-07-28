@@ -17,10 +17,73 @@ export const hashText = async (text = "") => {
   }
 };
 
+const PASSWORD_HASH_ALGORITHM = "pbkdf2-sha256-v1";
+const PASSWORD_HASH_ITERATIONS = 120000;
+
+const bytesToBase64Url = (bytes) => {
+  const binary = [...bytes].map((byte) => String.fromCharCode(byte)).join("");
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+};
+
+const base64UrlToBytes = (value = "") => {
+  const padded = value.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(value.length / 4) * 4, "=");
+  return Uint8Array.from(atob(padded), (char) => char.charCodeAt(0));
+};
+
+export const createPasswordSalt = () => {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return bytesToBase64Url(bytes);
+};
+
+export const createPasswordHash = async (password = "", salt = createPasswordSalt()) => {
+  try {
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      "raw",
+      encoder.encode(password),
+      "PBKDF2",
+      false,
+      ["deriveBits"],
+    );
+    const bits = await crypto.subtle.deriveBits(
+      {
+        name: "PBKDF2",
+        salt: base64UrlToBytes(salt),
+        iterations: PASSWORD_HASH_ITERATIONS,
+        hash: "SHA-256",
+      },
+      key,
+      256,
+    );
+    return `${PASSWORD_HASH_ALGORITHM}$${PASSWORD_HASH_ITERATIONS}$${salt}$${bytesToBase64Url(new Uint8Array(bits))}`;
+  } catch {
+    return `sha256-salted-v1$${salt}$${await hashText(`${salt}:${password}`)}`;
+  }
+};
+
+export const isModernPasswordHash = (passwordHash = "") =>
+  passwordHash.startsWith(`${PASSWORD_HASH_ALGORITHM}$`) || passwordHash.startsWith("sha256-salted-v1$");
+
+export const verifyPasswordHash = async (password = "", passwordHash = "") => {
+  if (!passwordHash) return false;
+  if (passwordHash.startsWith(`${PASSWORD_HASH_ALGORITHM}$`)) {
+    const [algorithm, iterations, salt, expected] = passwordHash.split("$");
+    if (algorithm !== PASSWORD_HASH_ALGORITHM || !iterations || !salt || !expected) return false;
+    const nextHash = await createPasswordHash(password, salt);
+    return nextHash === passwordHash;
+  }
+  if (passwordHash.startsWith("sha256-salted-v1$")) {
+    const [, salt, expected] = passwordHash.split("$");
+    return expected === await hashText(`${salt}:${password}`);
+  }
+  return passwordHash === await hashText(password);
+};
+
 export const withPassword = async (user, password) => ({
   ...user,
   password: "",
-  passwordHash: await hashText(password),
+  passwordHash: await createPasswordHash(password),
 });
 
 export const profileFromSupabase = (profile, session) => ({
@@ -166,17 +229,24 @@ export async function authenticateUser({
       if (!profile) return null;
       return profileFromSupabase(profile, session);
     } catch (error) {
-      console.warn("cloud-auth-fallback", error);
+      console.warn("cloud-auth-failed", error);
+      return null;
     }
   }
 
+  if (isProductionMode()) return null;
+
   const user = users.find((u) => (u.email || "").toLowerCase() === clean);
-  const hash = await hashText(cleanPassword);
 
   if (user) {
-    if (user.passwordHash === hash) return user;
+    if (await verifyPasswordHash(cleanPassword, user.passwordHash)) {
+      if (isModernPasswordHash(user.passwordHash)) return user;
+      const migrated = { ...user, passwordHash: await createPasswordHash(cleanPassword), password: "" };
+      setUsers(users.map((u) => (u.id === user.id ? migrated : u)));
+      return migrated;
+    }
     if (user.password && user.password === cleanPassword) {
-      const migrated = { ...user, passwordHash: hash, password: "" };
+      const migrated = { ...user, passwordHash: await createPasswordHash(cleanPassword), password: "" };
       setUsers(users.map((u) => (u.id === user.id ? migrated : u)));
       return migrated;
     }
