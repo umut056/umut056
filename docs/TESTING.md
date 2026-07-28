@@ -53,6 +53,7 @@ npm run doctor:production
 - Takvim/randevu servisi: koc/danisan/tarih filtresi, patch fallback, varsayilan session ve Turkce bildirim metinleri
 - Cloud mesaj map: gonderen adi metadata koruma
 - Okunmamis mesajlar: gonderen bazli adet, son mesaj ve onizleme ozeti
+- Medya kaliciligi: lokal kayit, cloud upload, offline fallback ve signed URL yenileme
 - Koc dashboard ozet hesaplama
 - Koc rapor selectorlari: eksik veri ve kapsamli danisan filtreleme regression testi
 - Profil patch: offline/local kayit, cloud merge, cloud hata fallback ve eksik id korumasi

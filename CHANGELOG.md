@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Medya kalicilik servisi lokal kayit, cloud upload, offline fallback ve signed URL yenileme testleriyle guvenceye alindi.
+
 - Takvim/randevu servisi koc/danisan/tarih filtresi, patch fallback, varsayilan session ve Turkce bildirim metinleriyle testlendi.
 
 - Koc action inbox servisi okunmamis mesajlari, fotograf onaylarini ve randevu taleplerini oncelikli tek listeye toplayacak sekilde eklendi.
