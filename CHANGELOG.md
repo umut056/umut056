@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Session saklama modeli tam kullanici objesi yerine guvenli oturum snapshot'ina indirildi; production cloud token restore akisi local cache'e bagimli olmayacak sekilde guclendirildi.
+
 - Local/demo auth sifre saklama PBKDF2 tabanli tuzlu hash formatina tasindi; eski SHA/plain kayitlar basarili giriste otomatik migrate ediliyor ve production auth hatasinda local fallback kapatildi.
 
 - Staging Supabase RLS capraz rol dogrulamasi icin `npm run test:rls:staging` eklendi; admin, koc ve danisan JWT senaryolari PASS olarak belgelendi.

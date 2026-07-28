@@ -1,4 +1,5 @@
 import { clearSession, saveSession, storedSession } from "../../lib/session.js";
+import { isProductionMode } from "../../lib/production.js";
 
 export function restoreStoredUser(users = []) {
   try {
@@ -9,6 +10,10 @@ export function restoreStoredUser(users = []) {
     const fresh = users.find((user) => user.id === sessionUser.id);
 
     if (!fresh) {
+      if (isProductionMode() && sessionUser?.supabaseToken) {
+        saveSession(sessionUser);
+        return sessionUser;
+      }
       clearSession();
       return null;
     }
