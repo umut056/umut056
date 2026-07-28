@@ -152,7 +152,24 @@ export function mergeCloudUsersWithLocal(
 export const mergeMessages = (cloudMsgs = [], localMsgs = []) => {
   const byId = new Map();
   [...cloudMsgs, ...localMsgs].forEach((message) => {
-    if (message?.id && !byId.has(message.id)) byId.set(message.id, message);
+    if (!message?.id) return;
+    const current = byId.get(message.id);
+    if (!current) {
+      byId.set(message.id, message);
+      return;
+    }
+    byId.set(message.id, {
+      ...current,
+      ...message,
+      readBy: [...new Set([...(current.readBy || []), ...(message.readBy || [])])],
+      readAt: { ...(current.readAt || {}), ...(message.readAt || {}) },
+      url: message.url || current.url,
+      storageBucket: message.storageBucket || current.storageBucket,
+      storagePath: message.storagePath || current.storagePath,
+      name: message.name || current.name,
+      text: message.text || current.text,
+      senderName: message.senderName || current.senderName,
+    });
   });
   return [...byId.values()].sort(
     (a, b) =>

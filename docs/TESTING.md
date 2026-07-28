@@ -49,15 +49,15 @@ npm run doctor:production
 - Koc dashboard ozet hesaplama
 - Danisan dashboard ilerleme hesaplama
 - Cloud/local workspace merge: program, vucut olcumu, gunluk ilerleme ve urun videosu koruma
+- Mesaj cloud/local merge: okundu bilgisi, medya metadatasi ve siralama koruma
 - Kritik mini smoke flow: program ata, gorev state uret, dashboard guncelle, mesajlari filtrele
 
 ## Sonraki Test Oncelikleri
 
 1. Login role smoke testleri.
-2. Mesajlasma karsilikli kalicilik testi.
-3. Rapor ve profil beyaz ekran regression testi.
-4. Android alarm logout/tamamlandi/offline testi.
-5. Supabase RLS ve Storage yetki testleri.
+2. Rapor ve profil beyaz ekran regression testi.
+3. Android alarm logout/tamamlandi/offline testi.
+4. Supabase RLS ve Storage yetki testleri.
 
 ## Not
 

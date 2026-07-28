@@ -292,6 +292,7 @@ const mapMessage = (message) => ({
   expiresAt: message.media_expires_at,
   readBy: message.read_by || [],
   date: message.created_at?.slice?.(0, 10),
+  createdAt: message.created_at ? new Date(message.created_at).getTime() : 0,
   time: message.created_at ? new Date(message.created_at).toLocaleTimeString("tr", { hour: "2-digit", minute: "2-digit" }) : "",
 });
 

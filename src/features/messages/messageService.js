@@ -116,6 +116,7 @@ export async function createMessageRecord({
       id: saved.id,
       time: saved.time,
       date: saved.date,
+      senderName: user.name,
       ...(room ? { room, to: room, createdAt: Date.now() } : {}),
     };
   }
@@ -127,6 +128,8 @@ export async function createMessageRecord({
     ...(room ? { room, createdAt: Date.now() } : {}),
     time: localMessageTime(),
     date: todayIsoDate(),
+    readBy: [user.id],
+    senderName: user.name,
     ...extra,
   };
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mergeCloudUsersWithLocal, normalizeUsers } from "./workspaceService.js";
+import { mergeCloudUsersWithLocal, mergeMessages, normalizeUsers } from "./workspaceService.js";
 
 const hasAssignedProgram = (client) =>
   !!(
@@ -129,5 +129,37 @@ describe("workspaceService", () => {
 
     expect(merged.productVideo).toEqual(localVideo);
     expect(merged.productVideos).toEqual([localVideo]);
+  });
+
+  it("merges cloud and local message metadata without losing read state", () => {
+    const merged = mergeMessages(
+      [
+        {
+          id: "m1",
+          from: "coach",
+          to: "client",
+          text: "Merhaba",
+          readBy: ["coach"],
+          createdAt: 10,
+        },
+      ],
+      [
+        {
+          id: "m1",
+          from: "coach",
+          to: "client",
+          readBy: ["client"],
+          readAt: { client: 100 },
+          url: "blob:local-photo",
+          createdAt: 10,
+        },
+      ],
+    );
+
+    expect(merged).toHaveLength(1);
+    expect(merged[0].readBy.sort()).toEqual(["client", "coach"]);
+    expect(merged[0].readAt).toEqual({ client: 100 });
+    expect(merged[0].text).toBe("Merhaba");
+    expect(merged[0].url).toBe("blob:local-photo");
   });
 });
