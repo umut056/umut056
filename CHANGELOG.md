@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Koc rapor selectorlari eksik veya gec yuklenen veriyle beyaz ekran riskine karsi guclendirildi.
+
 - Mesajlar icin sender_name metadata alani eklendi; cloud restore sonrasi gonderen adi kaybolmayacak.
 
 - Program gorevleri icin repeat/cycle metadata Supabase semasina, create/update akisina ve cloud restore map'ine eklendi.

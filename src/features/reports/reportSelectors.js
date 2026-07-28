@@ -1,26 +1,29 @@
 import { weightDelta } from "../../shared/lib/format.js";
 
+const asArray = (value) => (Array.isArray(value) ? value : []);
+
 export function coachReportClients(users = [], coachId) {
-  return (Array.isArray(users) ? users : []).filter(
+  return asArray(users).filter(
     (user) => user?.role === "client" && user.coachId === coachId,
   );
 }
 
 export function averageCompliance(clients = []) {
-  if (!clients.length) return 0;
+  const rows = asArray(clients);
+  if (!rows.length) return 0;
   return Math.round(
-    clients.reduce((total, client) => total + (Number(client.compliance) || 0), 0) / clients.length,
+    rows.reduce((total, client) => total + (Number(client?.compliance) || 0), 0) / rows.length,
   );
 }
 
 export function totalLostWeight(clients = []) {
-  return clients.reduce((total, client) => total + Math.max(0, weightDelta(client.body || {})), 0);
+  return asArray(clients).reduce((total, client) => total + Math.max(0, weightDelta(client?.body || {})), 0);
 }
 
 export function riskClients(clients = [], isRiskClient) {
-  return clients.filter((client) => {
+  return asArray(clients).filter((client) => {
     try {
-      return isRiskClient(client);
+      return typeof isRiskClient === "function" ? isRiskClient(client) : false;
     } catch {
       return false;
     }
@@ -56,23 +59,23 @@ export function clientProgressBody(body = {}) {
 }
 
 export function topClientProgressClients(users = [], limit = 6) {
-  return clientsByMonthlyScore((Array.isArray(users) ? users : []).filter((user) => user.role === "client"))
+  return clientsByMonthlyScore(asArray(users).filter((user) => user?.role === "client"))
     .slice(0, limit);
 }
 
 export function recentTaskLogsForClients(taskLogs = [], clients = [], limit = 8) {
-  const clientIds = new Set(clients.map((client) => client.id));
-  return taskLogs.filter((log) => clientIds.has(log.clientId)).slice(0, limit);
+  const clientIds = new Set(asArray(clients).map((client) => client?.id));
+  return asArray(taskLogs).filter((log) => clientIds.has(log?.clientId)).slice(0, limit);
 }
 
 export function clientsByCompliance(clients = []) {
-  return [...clients].sort((a, b) => (Number(b.compliance) || 0) - (Number(a.compliance) || 0));
+  return [...asArray(clients)].sort((a, b) => (Number(b?.compliance) || 0) - (Number(a?.compliance) || 0));
 }
 
 export function clientsByMonthlyScore(clients = []) {
-  return [...clients].sort(
+  return [...asArray(clients)].sort(
     (a, b) =>
-      ((b.compliance || 0) + (b.weeklyAverage || 0)) -
-      ((a.compliance || 0) + (a.weeklyAverage || 0)),
+      ((b?.compliance || 0) + (b?.weeklyAverage || 0)) -
+      ((a?.compliance || 0) + (a?.weeklyAverage || 0)),
   );
 }
