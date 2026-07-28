@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Takvim/randevu servisi koc/danisan/tarih filtresi, patch fallback, varsayilan session ve Turkce bildirim metinleriyle testlendi.
+
 - Koc action inbox servisi okunmamis mesajlari, fotograf onaylarini ve randevu taleplerini oncelikli tek listeye toplayacak sekilde eklendi.
 
 - Koc fotograf onay kuyrugu kapsam filtresi, danisan notu, onay/red/gizleme ve log olusturma testleriyle guvenceye alindi.

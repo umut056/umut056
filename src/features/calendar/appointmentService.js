@@ -1,4 +1,5 @@
 const isoDate = (date) => date.toISOString().split("T")[0];
+const asArray = (value) => (Array.isArray(value) ? value : []);
 
 export function todayIsoDate(date = new Date()) {
   return isoDate(date);
@@ -20,24 +21,25 @@ export function weekDateItems(baseDate = new Date(), weekOffset = 0) {
 }
 
 export function sessionsForCoach(sessions = [], coachId) {
-  return sessions.filter((session) => session.coachId === coachId);
+  return asArray(sessions).filter((session) => session.coachId === coachId);
 }
 
 export function sessionsForClient(sessions = [], clientId) {
-  return sessions.filter((session) => session.clientId === clientId);
+  return asArray(sessions).filter((session) => session.clientId === clientId);
 }
 
 export function sessionsForDate(sessions = [], date) {
-  return sessions.filter((session) => session.date === date);
+  return asArray(sessions).filter((session) => session.date === date);
 }
 
 export function applySessionPatch(sessions = [], id, patch = {}) {
-  const current = sessions.find((session) => session.id === id);
+  const rows = asArray(sessions);
+  const current = rows.find((session) => session.id === id);
   const updated = { ...(current || {}), ...patch };
   return {
     current,
     updated,
-    sessions: sessions.map((session) => (session.id === id ? updated : session)),
+    sessions: rows.map((session) => (session.id === id ? updated : session)),
   };
 }
 
