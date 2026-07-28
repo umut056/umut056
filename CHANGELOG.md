@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Koc action inbox servisi okunmamis mesajlari, fotograf onaylarini ve randevu taleplerini oncelikli tek listeye toplayacak sekilde eklendi.
+
 - Koc fotograf onay kuyrugu kapsam filtresi, danisan notu, onay/red/gizleme ve log olusturma testleriyle guvenceye alindi.
 
 - Profil patch servisi offline/local kayit, cloud merge, cloud hata fallback ve eksik id durumlari icin regression testleriyle guvenceye alindi.

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  coachActionInbox,
   markMessagesRead,
   unreadConversationSummaries,
   unreadCount,
@@ -52,5 +53,68 @@ describe("notificationService unread messages", () => {
     expect(result.changed).toBe(true);
     expect(result.messages.find((message) => message.id === "a").readBy).toContain("coach-1");
     expect(result.messages.find((message) => message.id === "b").readBy).not.toContain("coach-1");
+  });
+
+  it("builds a coach action inbox from proofs, unread messages and appointments", () => {
+    const inbox = coachActionInbox({
+      coachId: "coach-1",
+      users: [
+        { id: "coach-1", role: "coach", name: "Test Koc" },
+        { id: "client-1", role: "client", name: "Elif" },
+        { id: "client-2", role: "client", name: "Mert" },
+      ],
+      messages: [
+        {
+          id: "m1",
+          from: "client-1",
+          to: "coach-1",
+          text: "Merhaba",
+          time: "09:00",
+          createdAt: 1,
+          readBy: [],
+        },
+        {
+          id: "m2",
+          from: "client-1",
+          to: "coach-1",
+          text: "Foto attim",
+          time: "09:02",
+          createdAt: 2,
+          readBy: [],
+        },
+      ],
+      proofActions: [
+        {
+          id: "p1",
+          client: { id: "client-2", name: "Mert" },
+          task: "Sabah tartisi",
+          note: "Tarti net",
+          time: "08:00",
+        },
+      ],
+      appointments: [
+        {
+          id: "s1",
+          coachId: "coach-1",
+          clientId: "client-1",
+          status: "pending",
+          date: "2026-07-28",
+          time: "14:00",
+        },
+      ],
+    });
+
+    expect(inbox.map((item) => item.type)).toEqual(["proof", "message", "appointment"]);
+    expect(inbox[0]).toMatchObject({
+      clientName: "Mert",
+      title: "Mert fotoğraf gönderdi",
+      text: "Sabah tartisi · Tarti net",
+    });
+    expect(inbox[1]).toMatchObject({
+      clientName: "Elif",
+      count: 2,
+      text: "2 okunmamış mesaj · Foto attim",
+    });
+    expect(inbox[2].text).toContain("Elif");
   });
 });

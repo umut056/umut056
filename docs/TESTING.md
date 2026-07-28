@@ -49,6 +49,7 @@ npm run doctor:production
 - Koc-danisan mesaj filtresi
 - Grup/oda mesaj siralama
 - Mesaj onizleme metni
+- Koc action inbox: okunmamis mesaj, fotograf onayi ve randevu taleplerini oncelikli tek listede toplama
 - Cloud mesaj map: gonderen adi metadata koruma
 - Okunmamis mesajlar: gonderen bazli adet, son mesaj ve onizleme ozeti
 - Koc dashboard ozet hesaplama

@@ -1,4 +1,5 @@
 const timeTr = () => new Date().toLocaleTimeString("tr", { hour: "2-digit", minute: "2-digit" });
+const asArray = (value) => (Array.isArray(value) ? value : []);
 
 export function unreadMessagesFor(messages = [], userId, fromId = null) {
   if (!userId) return [];
@@ -49,6 +50,66 @@ export function unreadConversationSummaries(messages = [], userId, participants 
     });
 
   return [...grouped.values()].sort((a, b) => (b.lastMessage?.createdAt || 0) - (a.lastMessage?.createdAt || 0));
+}
+
+export function coachActionInbox({
+  coachId,
+  users = [],
+  messages = [],
+  appointments = [],
+  proofActions = [],
+  getPreviewText = null,
+}) {
+  if (!coachId) return [];
+
+  const userById = new Map(asArray(users).map((user) => [user.id, user]));
+  const messageItems = unreadConversationSummaries(messages, coachId, asArray(users), getPreviewText).map((summary) => ({
+    id: `message-${summary.senderId}`,
+    type: "message",
+    priority: 80,
+    clientId: summary.senderId,
+    clientName: summary.senderName,
+    title: `${summary.senderName} mesaj gönderdi`,
+    text: `${summary.count} okunmamış mesaj · ${summary.lastText}`,
+    count: summary.count,
+    time: summary.lastTime,
+    source: summary.lastMessage,
+  }));
+
+  const proofItems = asArray(proofActions).map((proof, index) => ({
+    id: `proof-${proof.id || proof.client?.id || index}`,
+    type: "proof",
+    priority: 90,
+    clientId: proof.client?.id || proof.clientId,
+    clientName: proof.client?.name || userById.get(proof.clientId)?.name || "Danışan",
+    title: `${proof.client?.name || userById.get(proof.clientId)?.name || "Danışan"} fotoğraf gönderdi`,
+    text: proof.note ? `${proof.task || "Görev"} · ${proof.note}` : proof.task || "Fotoğraf onayı bekliyor",
+    count: 1,
+    time: proof.time || "",
+    source: proof,
+  }));
+
+  const appointmentItems = asArray(appointments)
+    .filter((appointment) => appointment?.coachId === coachId && ["pending", "proposed"].includes(appointment.status))
+    .map((appointment) => {
+      const client = userById.get(appointment.clientId);
+      return {
+        id: `appointment-${appointment.id}`,
+        type: "appointment",
+        priority: appointment.status === "pending" ? 70 : 60,
+        clientId: appointment.clientId,
+        clientName: client?.name || "Danışan",
+        title: appointment.status === "pending" ? "Randevu talebi" : "Randevu saat önerisi",
+        text: `${client?.name || "Danışan"} · ${appointment.date || "-"} ${appointment.time || ""}`.trim(),
+        count: 1,
+        time: appointment.time || "",
+        source: appointment,
+      };
+    });
+
+  return [...proofItems, ...messageItems, ...appointmentItems].sort(
+    (a, b) => b.priority - a.priority || String(b.time || "").localeCompare(String(a.time || "")),
+  );
 }
 
 export function markMessagesRead(messages = [], userId, fromId = null) {
