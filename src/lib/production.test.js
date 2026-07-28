@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mapCloudProgramTask, serializeProgramTaskForCloud } from "./production.js";
+import { mapCloudMessage, mapCloudProgramTask, serializeProgramTaskForCloud } from "./production.js";
 
 describe("production program task mapping", () => {
   it("maps cloud cycle metadata back into app tasks", () => {
@@ -52,6 +52,29 @@ describe("production program task mapping", () => {
       cycle_length: 5,
       cycle_days: [3, 4],
       sort_order: 2,
+    });
+  });
+});
+
+describe("production message mapping", () => {
+  it("keeps sender names from cloud messages for unread previews", () => {
+    expect(
+      mapCloudMessage({
+        id: "message-1",
+        sender_id: "client-1",
+        receiver_id: "coach-1",
+        sender_name: "Elif Yılmaz",
+        message_type: "text",
+        text: "Merhaba",
+        read_by: ["client-1"],
+        created_at: "2026-07-28T10:15:00.000Z",
+      }),
+    ).toMatchObject({
+      id: "message-1",
+      from: "client-1",
+      to: "coach-1",
+      senderName: "Elif Yılmaz",
+      text: "Merhaba",
     });
   });
 });

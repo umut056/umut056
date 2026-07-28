@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Mesajlar icin sender_name metadata alani eklendi; cloud restore sonrasi gonderen adi kaybolmayacak.
+
 - Program gorevleri icin repeat/cycle metadata Supabase semasina, create/update akisina ve cloud restore map'ine eklendi.
 
 - Mesaj cloud/local merge akisi okundu bilgisi, medya metadatasi, gonderen adi ve cloud siralama bilgisini koruyacak sekilde guclendirildi.

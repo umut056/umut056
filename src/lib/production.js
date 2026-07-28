@@ -279,11 +279,12 @@ const mapProfile = (profile) => ({
   createdAt: profile.created_at?.slice?.(0, 10),
 });
 
-const mapMessage = (message) => ({
+export const mapCloudMessage = (message) => ({
   id: message.id,
   from: message.sender_id,
   to: message.receiver_id,
   text: message.text,
+  senderName: message.sender_name || "",
   kind: message.message_type === "photo" || message.message_type === "audio" ? message.message_type : "text",
   url: message.media_url,
   storageBucket: message.media_storage_bucket,
@@ -459,7 +460,7 @@ export const loadProductionWorkspace = async (token) => {
         notifications: mappedNotifications.filter((notice) => notice.userId === profile.id),
       };
     }),
-    msgs: (messages || []).map(mapMessage),
+    msgs: (messages || []).map(mapCloudMessage),
     sess: (appointments || []).map(mapAppointment),
     programs: mappedPrograms,
   };
@@ -518,6 +519,7 @@ export const createCloudMessage = async ({ from, to, room, kind = "text", text =
       room: room || null,
       message_type: kind === "photo" || kind === "audio" ? kind : "text",
       text,
+      sender_name: senderName || null,
       media_url: url || null,
       media_storage_bucket: storageBucket || null,
       media_storage_path: storagePath || null,
@@ -526,7 +528,7 @@ export const createCloudMessage = async ({ from, to, room, kind = "text", text =
       read_by: [from],
     }],
   });
-  const saved = rows?.[0] ? mapMessage(rows[0]) : null;
+  const saved = rows?.[0] ? mapCloudMessage(rows[0]) : null;
   if (saved?.to) {
     try {
       const prefix = senderName ? `${senderName}: ` : "";

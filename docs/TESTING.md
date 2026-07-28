@@ -46,6 +46,7 @@ npm run doctor:production
 - Koc-danisan mesaj filtresi
 - Grup/oda mesaj siralama
 - Mesaj onizleme metni
+- Cloud mesaj map: gonderen adi metadata koruma
 - Koc dashboard ozet hesaplama
 - Danisan dashboard ilerleme hesaplama
 - Cloud/local workspace merge: program, vucut olcumu, gunluk ilerleme ve urun videosu koruma

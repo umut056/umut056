@@ -124,6 +124,7 @@ create table if not exists public.messages (
   room text,
   message_type text not null default 'text' check (message_type in ('text','photo','audio','system')),
   text text,
+  sender_name text,
   media_url text,
   media_storage_bucket text,
   media_storage_path text,
@@ -208,6 +209,7 @@ alter table if exists public.messages add column if not exists media_storage_buc
 alter table if exists public.messages add column if not exists media_storage_path text;
 alter table if exists public.messages add column if not exists media_name text;
 alter table if exists public.messages add column if not exists media_expires_at timestamptz;
+alter table if exists public.messages add column if not exists sender_name text;
 
 create or replace function public.current_role()
 returns text
