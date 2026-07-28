@@ -47,6 +47,7 @@ npm run doctor:production
 - Grup/oda mesaj siralama
 - Mesaj onizleme metni
 - Cloud mesaj map: gonderen adi metadata koruma
+- Okunmamis mesajlar: gonderen bazli adet, son mesaj ve onizleme ozeti
 - Koc dashboard ozet hesaplama
 - Koc rapor selectorlari: eksik veri ve kapsamli danisan filtreleme regression testi
 - Auth registration: rol, ref kodu, aktivasyon kodu ve lokal danisan varsayilanlari

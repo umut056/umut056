@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Okunmamis mesajlar icin gonderen bazli adet, son mesaj ve onizleme ozeti notification service'e eklendi.
+
 - Auth kayit dogrulama ve lokal danisan varsayilanlari regression testleriyle guvenceye alindi.
 
 - Koc rapor selectorlari eksik veya gec yuklenen veriyle beyaz ekran riskine karsi guclendirildi.

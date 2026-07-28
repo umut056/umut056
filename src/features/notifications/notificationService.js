@@ -18,6 +18,39 @@ export function unreadCountFrom(messages = [], userId, fromId) {
   return unreadMessagesFor(messages, userId, fromId).length;
 }
 
+export function unreadConversationSummaries(messages = [], userId, participants = [], getPreviewText = null) {
+  if (!userId) return [];
+
+  const participantById = new Map(participants.map((participant) => [participant.id, participant]));
+  const grouped = new Map();
+  const preview = typeof getPreviewText === "function" ? getPreviewText : (message) => message?.text || "Mesaj";
+
+  unreadMessagesFor(messages, userId)
+    .slice()
+    .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))
+    .forEach((message) => {
+      const current = grouped.get(message.from) || {
+        senderId: message.from,
+        senderName: message.senderName || participantById.get(message.from)?.name || "Yeni mesaj",
+        count: 0,
+        lastMessage: null,
+        lastText: "",
+        lastTime: "",
+      };
+
+      current.count += 1;
+      current.lastMessage = message;
+      current.lastText = preview(message);
+      current.lastTime = message.time || "";
+      if (!current.senderName || current.senderName === "Yeni mesaj") {
+        current.senderName = message.senderName || participantById.get(message.from)?.name || current.senderName;
+      }
+      grouped.set(message.from, current);
+    });
+
+  return [...grouped.values()].sort((a, b) => (b.lastMessage?.createdAt || 0) - (a.lastMessage?.createdAt || 0));
+}
+
 export function markMessagesRead(messages = [], userId, fromId = null) {
   if (!userId) return { messages, changed: false };
   let changed = false;
