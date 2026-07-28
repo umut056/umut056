@@ -3,6 +3,75 @@ import { normalizeBody } from "../measurements/measurementService.js";
 const numeric = (value, fallback = 0) =>
   Number.isFinite(Number(value)) ? Number(value) : fallback;
 
+const bodyNumberKeys = [
+  "height",
+  "age",
+  "start",
+  "current",
+  "target",
+  "water",
+  "fat",
+  "muscle",
+  "bmi",
+  "waist",
+  "hip",
+  "chest",
+  "excess",
+];
+
+const hasValue = (value) => value !== undefined && value !== null && value !== "";
+
+const hasNonZeroLocal = (localBody, key) => Number(localBody?.[key] || 0) !== 0;
+
+const mergeBody = (localBody = {}, cloudBody = {}) => {
+  const merged = { ...localBody, ...cloudBody };
+
+  bodyNumberKeys.forEach((key) => {
+    const cloudValue = cloudBody?.[key];
+    if (Number(cloudValue || 0) === 0 && hasNonZeroLocal(localBody, key)) {
+      merged[key] = localBody[key];
+    }
+  });
+
+  if ((!hasValue(cloudBody.gender) || cloudBody.gender === "female") && hasValue(localBody.gender)) {
+    merged.gender = localBody.gender;
+  }
+  if ((!hasValue(cloudBody.ideal) || cloudBody.ideal === "-") && hasValue(localBody.ideal)) {
+    merged.ideal = localBody.ideal;
+  }
+
+  return merged;
+};
+
+const sameProgramAssignment = (local = {}, cloud = {}) =>
+  !!local.programTemplateId &&
+  !!cloud.programTemplateId &&
+  local.programTemplateId === cloud.programTemplateId;
+
+const hasCloudDailyState = (user = {}) =>
+  Object.keys(user.dailyTasks || {}).length > 0 ||
+  Object.keys(user.photoProofs || {}).length > 0 ||
+  (Array.isArray(user.tasks) && user.tasks.some(Boolean));
+
+const hasLocalDailyState = (user = {}) =>
+  hasCloudDailyState(user) ||
+  Number(user.compliance || 0) > 0 ||
+  Number(user.weeklyAverage || 0) > 0 ||
+  Number(user.missedToday || 0) > 0;
+
+const localProgressPatch = (local = {}, cloud = {}) => {
+  if (!sameProgramAssignment(local, cloud) || hasCloudDailyState(cloud) || !hasLocalDailyState(local)) return {};
+
+  return {
+    tasks: Array.isArray(local.tasks) ? local.tasks : cloud.tasks,
+    pendingToday: local.pendingToday,
+    photoPendingToday: local.photoPendingToday,
+    missedToday: local.missedToday,
+    compliance: local.compliance,
+    weeklyAverage: local.weeklyAverage,
+  };
+};
+
 export const normalizeUserDefaults = (user = {}) => {
   const tasks = Array.isArray(user.tasks) ? user.tasks : [];
 
@@ -57,12 +126,13 @@ export function mergeCloudUsersWithLocal(
     return normalizeUserDefaults({
       ...local,
       ...user,
-      body: { ...(local.body || {}), ...(user.body || {}) },
+      body: mergeBody(local.body || {}, user.body || {}),
       dailyTasks: { ...(local.dailyTasks || {}), ...(user.dailyTasks || {}) },
       photoProofs: { ...(local.photoProofs || {}), ...(user.photoProofs || {}) },
       productVideos: (user.productVideos?.length ? user.productVideos : local.productVideos) || [],
       productVideo: user.productVideo || local.productVideo,
       productVideoDraft: user.productVideoDraft || local.productVideoDraft,
+      ...localProgressPatch(local, user),
       ...(localAssigned && !cloudAssigned
         ? {
             program: local.program,

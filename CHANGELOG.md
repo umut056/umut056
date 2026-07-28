@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Cloud/local workspace merge guclendirildi; eksik cloud snapshot program, vucut olcumu, gunluk ilerleme veya urun videosu bilgisini artik gereksiz ezmiyor.
+
 - Session saklama modeli tam kullanici objesi yerine guvenli oturum snapshot'ina indirildi; production cloud token restore akisi local cache'e bagimli olmayacak sekilde guclendirildi.
 
 - Local/demo auth sifre saklama PBKDF2 tabanli tuzlu hash formatina tasindi; eski SHA/plain kayitlar basarili giriste otomatik migrate ediliyor ve production auth hatasinda local fallback kapatildi.

@@ -48,18 +48,17 @@ npm run doctor:production
 - Mesaj onizleme metni
 - Koc dashboard ozet hesaplama
 - Danisan dashboard ilerleme hesaplama
+- Cloud/local workspace merge: program, vucut olcumu, gunluk ilerleme ve urun videosu koruma
 - Kritik mini smoke flow: program ata, gorev state uret, dashboard guncelle, mesajlari filtrele
 
 ## Sonraki Test Oncelikleri
 
 1. Login role smoke testleri.
-2. Program atama cloud/local senkron testi.
-3. Mesajlasma karsilikli kalicilik testi.
-4. Rapor ve profil beyaz ekran regression testi.
-5. Android alarm logout/tamamlandi/offline testi.
-6. Supabase RLS ve Storage yetki testleri.
+2. Mesajlasma karsilikli kalicilik testi.
+3. Rapor ve profil beyaz ekran regression testi.
+4. Android alarm logout/tamamlandi/offline testi.
+5. Supabase RLS ve Storage yetki testleri.
 
 ## Not
 
 Bu ilk paket bilerek servis ve selector seviyesinde baslatildi. Amac calisan ekrani bozmadan hizli ve guvenilir bir test zemini kurmaktir. React ekran testleri `App.jsx` parcala-refactor ilerledikce daha saglikli eklenecektir.
-
