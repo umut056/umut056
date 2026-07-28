@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Auth kayit dogrulama ve lokal danisan varsayilanlari regression testleriyle guvenceye alindi.
+
 - Koc rapor selectorlari eksik veya gec yuklenen veriyle beyaz ekran riskine karsi guclendirildi.
 
 - Mesajlar icin sender_name metadata alani eklendi; cloud restore sonrasi gonderen adi kaybolmayacak.
