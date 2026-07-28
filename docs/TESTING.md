@@ -52,6 +52,7 @@ npm run doctor:production
 - Okunmamis mesajlar: gonderen bazli adet, son mesaj ve onizleme ozeti
 - Koc dashboard ozet hesaplama
 - Koc rapor selectorlari: eksik veri ve kapsamli danisan filtreleme regression testi
+- Profil patch: offline/local kayit, cloud merge, cloud hata fallback ve eksik id korumasi
 - Auth registration: rol, ref kodu, aktivasyon kodu ve lokal danisan varsayilanlari
 - Danisan dashboard ilerleme hesaplama
 - Android alarm hardening: native kanal surumu, tekrar araligi ve kilit ekrani manuel test akisi

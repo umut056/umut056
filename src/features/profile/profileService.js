@@ -3,7 +3,7 @@ import { isProductionMode, saveProfilePatch } from "../../lib/production.js";
 export async function resolveProfilePatch({ user, patch, logLabel = "cloud-profile" }) {
   let updated = { ...user, ...patch };
 
-  if (isProductionMode() && user?.supabaseToken) {
+  if (isProductionMode() && user?.id && user?.supabaseToken) {
     try {
       updated = {
         ...updated,
