@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Program gorevleri icin repeat/cycle metadata Supabase semasina, create/update akisina ve cloud restore map'ine eklendi.
+
 - Mesaj cloud/local merge akisi okundu bilgisi, medya metadatasi, gonderen adi ve cloud siralama bilgisini koruyacak sekilde guclendirildi.
 
 - Cloud/local workspace merge guclendirildi; eksik cloud snapshot program, vucut olcumu, gunluk ilerleme veya urun videosu bilgisini artik gereksiz ezmiyor.

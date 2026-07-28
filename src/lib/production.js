@@ -318,6 +318,43 @@ const mapNotification = (notification) => ({
   time: notification.created_at ? new Date(notification.created_at).toLocaleTimeString("tr", { hour: "2-digit", minute: "2-digit" }) : "",
 });
 
+const defaultRepeatDays = [1, 2, 3, 4, 5, 6, 7];
+
+const asArray = (value, fallback = []) => (Array.isArray(value) ? value : fallback);
+
+export const mapCloudProgramTask = (task = {}) => ({
+  id: task.id,
+  title: task.title,
+  section: task.section,
+  type: task.task_type,
+  scheduledTime: task.scheduled_time?.slice?.(0, 5) || task.scheduled_time,
+  note: task.note,
+  photoRequired: task.photo_required,
+  snoozeEnabled: task.snooze_enabled,
+  snoozeOptions: task.snooze_options || [15, 30, 60],
+  repeatType: task.repeat_type || "daily",
+  repeatDays: asArray(task.repeat_days, defaultRepeatDays),
+  cycleLength: task.cycle_length || undefined,
+  cycleDays: asArray(task.cycle_days, []),
+});
+
+export const serializeProgramTaskForCloud = (programId, task = {}, index = 0) => ({
+  program_id: programId,
+  title: task.title,
+  section: task.section || "Genel",
+  task_type: task.type || "meal",
+  scheduled_time: task.scheduledTime || "09:00",
+  note: task.note || "",
+  photo_required: task.photoRequired !== false,
+  snooze_enabled: task.snoozeEnabled !== false,
+  snooze_options: task.snoozeOptions || [15, 30, 60],
+  repeat_type: task.repeatType || "daily",
+  repeat_days: task.repeatDays || defaultRepeatDays,
+  cycle_length: task.cycleLength || null,
+  cycle_days: task.cycleDays || [],
+  sort_order: index,
+});
+
 const mapProgram = (program, tasks = []) => ({
   id: program.id,
   coachId: program.coach_id,
@@ -330,19 +367,7 @@ const mapProgram = (program, tasks = []) => ({
   tasks: tasks
     .filter((task) => task.program_id === program.id)
     .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
-    .map((task) => ({
-      id: task.id,
-      title: task.title,
-      section: task.section,
-      type: task.task_type,
-      scheduledTime: task.scheduled_time?.slice?.(0, 5) || task.scheduled_time,
-      note: task.note,
-      photoRequired: task.photo_required,
-      snoozeEnabled: task.snooze_enabled,
-      snoozeOptions: task.snooze_options || [15, 30, 60],
-      repeatType: "daily",
-      repeatDays: [1, 2, 3, 4, 5, 6, 7],
-    })),
+    .map(mapCloudProgramTask),
 });
 
 const mapMediaFile = (media) => ({
@@ -648,18 +673,7 @@ export const createCloudProgram = async (program, token) => {
   });
   const saved = rows?.[0];
   if (!saved) return null;
-  const tasks = (program.tasks || []).map((task, index) => ({
-    program_id: saved.id,
-    title: task.title,
-    section: task.section || "Genel",
-    task_type: task.type || "meal",
-    scheduled_time: task.scheduledTime || "09:00",
-    note: task.note || "",
-    photo_required: task.photoRequired !== false,
-    snooze_enabled: task.snoozeEnabled !== false,
-    snooze_options: task.snoozeOptions || [15, 30, 60],
-    sort_order: index,
-  }));
+  const tasks = (program.tasks || []).map((task, index) => serializeProgramTaskForCloud(saved.id, task, index));
   if (tasks.length) {
     await supabaseRest("program_tasks", { method: "POST", token, body: tasks });
   }
@@ -711,18 +725,7 @@ export const updateCloudProgram = async (program, token) => {
     query: `?program_id=eq.${program.id}`,
     prefer: "return=minimal",
   });
-  const tasks = (program.tasks || []).map((task, index) => ({
-    program_id: program.id,
-    title: task.title,
-    section: task.section || "Genel",
-    task_type: task.type || "meal",
-    scheduled_time: task.scheduledTime || "09:00",
-    note: task.note || "",
-    photo_required: task.photoRequired !== false,
-    snooze_enabled: task.snoozeEnabled !== false,
-    snooze_options: task.snoozeOptions || [15, 30, 60],
-    sort_order: index,
-  }));
+  const tasks = (program.tasks || []).map((task, index) => serializeProgramTaskForCloud(program.id, task, index));
   if (tasks.length) {
     await supabaseRest("program_tasks", { method: "POST", token, body: tasks });
   }

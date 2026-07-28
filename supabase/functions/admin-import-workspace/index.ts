@@ -107,6 +107,10 @@ async function importProgram(program: any, coachId: string | null) {
     photo_required: task.photoRequired ?? task.photo ?? true,
     snooze_enabled: task.snoozeEnabled ?? true,
     snooze_options: task.snoozeOptions || [15, 30, 60],
+    repeat_type: task.repeatType || "daily",
+    repeat_days: task.repeatDays || [1, 2, 3, 4, 5, 6, 7],
+    cycle_length: task.cycleLength || null,
+    cycle_days: task.cycleDays || [],
     sort_order: index,
   }));
   if (tasks.length) {

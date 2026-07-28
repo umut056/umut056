@@ -50,6 +50,7 @@ npm run doctor:production
 - Danisan dashboard ilerleme hesaplama
 - Cloud/local workspace merge: program, vucut olcumu, gunluk ilerleme ve urun videosu koruma
 - Mesaj cloud/local merge: okundu bilgisi, medya metadatasi ve siralama koruma
+- Program task cloud mapping: repeat/cycle metadata create, update ve restore koruma
 - Kritik mini smoke flow: program ata, gorev state uret, dashboard guncelle, mesajlari filtrele
 
 ## Sonraki Test Oncelikleri

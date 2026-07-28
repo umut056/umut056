@@ -56,6 +56,10 @@ create table if not exists public.program_tasks (
   photo_required boolean not null default true,
   snooze_enabled boolean not null default true,
   snooze_options jsonb not null default '[15,30,60]'::jsonb,
+  repeat_type text not null default 'daily',
+  repeat_days jsonb not null default '[1,2,3,4,5,6,7]'::jsonb,
+  cycle_length integer,
+  cycle_days jsonb not null default '[]'::jsonb,
   sort_order integer not null default 0
 );
 
