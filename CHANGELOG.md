@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Kilo ve vucut olcum servisleri bos deger, degisim hesaplama ve format fallback testleriyle guvenceye alindi.
+
 - Medya kalicilik servisi lokal kayit, cloud upload, offline fallback ve signed URL yenileme testleriyle guvenceye alindi.
 
 - Takvim/randevu servisi koc/danisan/tarih filtresi, patch fallback, varsayilan session ve Turkce bildirim metinleriyle testlendi.

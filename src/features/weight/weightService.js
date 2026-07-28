@@ -1,3 +1,5 @@
+import { normalizeBody } from "../measurements/measurementService.js";
+
 export const safeNumber = (value, fallback = 0) =>
   Number.isFinite(Number(value)) ? Number(value) : fallback;
 
@@ -9,12 +11,25 @@ const localTime = () =>
 export function buildWeightUpdate(client, weight) {
   const value = Number(weight);
   const currentClient = client || {};
-  const hasStart = Number(currentClient.body?.start) > 0;
+  const existingBody = normalizeBody(currentClient.body || {});
   const startedAt =
     currentClient.startedAt || currentClient.createdAtTime || new Date().toISOString();
+
+  if (!Number.isFinite(value) || value <= 0) {
+    return {
+      startedAt,
+      createdAtTime: currentClient.createdAtTime || startedAt,
+      body: existingBody,
+      weightLogs: Array.isArray(currentClient.weightLogs)
+        ? currentClient.weightLogs.slice(0, 90)
+        : [],
+    };
+  }
+
+  const hasStart = Number(existingBody.start) > 0;
   const body = {
-    ...(currentClient.body || {}),
-    start: hasStart ? currentClient.body.start : value,
+    ...existingBody,
+    start: hasStart ? existingBody.start : value,
     current: value,
   };
   const weightLogs = [
@@ -24,7 +39,7 @@ export function buildWeightUpdate(client, weight) {
       time: localTime(),
       createdAt: new Date().toISOString(),
     },
-    ...(currentClient.weightLogs || []),
+    ...(Array.isArray(currentClient.weightLogs) ? currentClient.weightLogs : []),
   ].slice(0, 90);
 
   return {

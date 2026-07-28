@@ -15,8 +15,19 @@ export const maskName = (name = "") =>
     .map((part) => (part[0] ? `${part[0]}${"*".repeat(Math.max(3, part.length - 1))}` : ""))
     .join(" ");
 
-export const weightDelta = (body = {}) =>
-  +((Number(body.start) || 0) - (Number(body.current) || 0)).toFixed(1);
+export const hasWeightPair = (body = {}) => Number(body.start) > 0 && Number(body.current) > 0;
+
+export const weightDelta = (body = {}) => {
+  if (!hasWeightPair(body)) return 0;
+  return +((Number(body.start) || 0) - (Number(body.current) || 0)).toFixed(1);
+};
+
+export const formatWeightKg = (value, fallback = "Henüz girilmedi") => {
+  const number = Number(value);
+  if (!Number.isFinite(number) || number <= 0) return fallback;
+  const label = Number.isInteger(number) ? String(number) : number.toFixed(1);
+  return `${label} kg`;
+};
 
 export const monthlyBadge = (client, rank = 0) => {
   const score = Math.round(((client.compliance || 0) + (client.weeklyAverage || 0) + (client.streakDays || 0) * 3) / 2.1);
