@@ -19,8 +19,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class StepWiseAlarmReceiver extends BroadcastReceiver {
-    private static final String CHANNEL_ID = "stepwise_task_alarm_v6";
-    private static final long REPEAT_DELAY_MS = 2 * 60 * 1000;
+    private static final String CHANNEL_ID = "stepwise_task_alarm_v7";
+    private static final long REPEAT_DELAY_MS = 60 * 1000;
+    private static final long[] ALARM_VIBRATION_PATTERN = new long[]{0, 1200, 250, 1200, 250, 1600, 350, 1600, 500};
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -52,6 +53,7 @@ public class StepWiseAlarmReceiver extends BroadcastReceiver {
             channel.setDescription("G\u00f6rev zaman\u0131 geldi\u011finde kilit ekran\u0131nda sesli alarm verir.");
             channel.setSound(alarmSound, audio);
             channel.enableVibration(true);
+            channel.setVibrationPattern(ALARM_VIBRATION_PATTERN);
             channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             channel.setBypassDnd(true);
             manager.createNotificationChannel(channel);
@@ -75,7 +77,8 @@ public class StepWiseAlarmReceiver extends BroadcastReceiver {
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setSound(alarmSound)
-            .setVibrate(new long[]{0, 900, 300, 900, 300, 1200, 400, 1200})
+            .setVibrate(ALARM_VIBRATION_PATTERN)
+            .setDefaults(Notification.DEFAULT_LIGHTS)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setOnlyAlertOnce(false)
             .setAutoCancel(false)
@@ -87,11 +90,10 @@ public class StepWiseAlarmReceiver extends BroadcastReceiver {
 
         Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
         if (vibrator != null) {
-            long[] pattern = new long[]{0, 900, 300, 900, 300, 1200, 400, 1200};
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1));
+                vibrator.vibrate(VibrationEffect.createWaveform(ALARM_VIBRATION_PATTERN, -1));
             } else {
-                vibrator.vibrate(pattern, -1);
+                vibrator.vibrate(ALARM_VIBRATION_PATTERN, -1);
             }
         }
         scheduleRepeatIfStillActive(context, alarmId, title, time);

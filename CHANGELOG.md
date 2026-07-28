@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Android gorev alarmlari v7 kanalina tasindi; kilit ekraninda daha belirgin titresim ve 1 dakikalik tekrar davranisi eklendi.
+
 - Okunmamis mesajlar icin gonderen bazli adet, son mesaj ve onizleme ozeti notification service'e eklendi.
 
 - Auth kayit dogrulama ve lokal danisan varsayilanlari regression testleriyle guvenceye alindi.

@@ -52,6 +52,7 @@ npm run doctor:production
 - Koc rapor selectorlari: eksik veri ve kapsamli danisan filtreleme regression testi
 - Auth registration: rol, ref kodu, aktivasyon kodu ve lokal danisan varsayilanlari
 - Danisan dashboard ilerleme hesaplama
+- Android alarm hardening: native kanal surumu, tekrar araligi ve kilit ekrani manuel test akisi
 - Cloud/local workspace merge: program, vucut olcumu, gunluk ilerleme ve urun videosu koruma
 - Mesaj cloud/local merge: okundu bilgisi, medya metadatasi ve siralama koruma
 - Program task cloud mapping: repeat/cycle metadata create, update ve restore koruma
