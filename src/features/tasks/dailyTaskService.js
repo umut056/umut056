@@ -31,3 +31,14 @@ export function mergeDailyUser(user, tasks = [], state, extra = {}, date = today
       .length,
   };
 }
+
+export function visibleDailyTasks(tasks = [], state = {}) {
+  const checks = Array.isArray(state.tasks) ? state.tasks : [];
+  return (Array.isArray(tasks) ? tasks : [])
+    .map((task, index) => ({ task, index }))
+    .filter(({ index }) => !checks[index]);
+}
+
+export function dailyTasksComplete(tasks = [], state = {}) {
+  return visibleDailyTasks(tasks, state).length === 0 && (Array.isArray(tasks) ? tasks.length : 0) > 0;
+}

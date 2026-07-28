@@ -43,6 +43,7 @@ npm run doctor:production
 - Program videosunun atamaya eklenmesi
 - Gunluk gorev state olusturma
 - Yeni gunde gorev state sifirlama
+- Tamamlanan gunluk gorevlerin aktif listeden dusmesi ve gun tamamlama kurali
 - Gunluk compliance ve bekleyen gorev hesaplama
 - Gorev alarm kurallari: aktif gorev filtresi, erteleme onceligi, 5 dakika gecikme toleransi ve izin uyarilari
 - Koc fotograf onay kuyrugu: kapsam filtresi, danisan notu, onay/red/gizleme ve log olusturma

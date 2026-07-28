@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dailyStateFor, mergeDailyUser } from "./dailyTaskService.js";
+import { dailyStateFor, dailyTasksComplete, mergeDailyUser, visibleDailyTasks } from "./dailyTaskService.js";
 
 describe("dailyTaskService", () => {
   it("creates a fresh daily state for the requested date", () => {
@@ -47,5 +47,27 @@ describe("dailyTaskService", () => {
     expect(merged.photoPendingToday).toBe(0);
     expect(merged.dailyTasks["2026-07-22"].tasks).toEqual([true, false]);
   });
-});
 
+  it("returns only unfinished tasks for the client task list", () => {
+    const tasks = [{ title: "Tarti" }, { title: "Shake" }, { title: "Ara ogun" }];
+    const state = { date: "2026-07-22", tasks: [true, false, true] };
+
+    const visible = visibleDailyTasks(tasks, state);
+
+    expect(visible).toEqual([{ task: { title: "Shake" }, index: 1 }]);
+    expect(dailyTasksComplete(tasks, state)).toBe(false);
+  });
+
+  it("marks the day complete when every task is finished", () => {
+    const tasks = [{ title: "Tarti" }, { title: "Shake" }];
+    const state = { date: "2026-07-22", tasks: [true, true] };
+
+    expect(visibleDailyTasks(tasks, state)).toEqual([]);
+    expect(dailyTasksComplete(tasks, state)).toBe(true);
+  });
+
+  it("does not mark an empty task plan as complete", () => {
+    expect(visibleDailyTasks(null, { tasks: [true] })).toEqual([]);
+    expect(dailyTasksComplete([], { tasks: [] })).toBe(false);
+  });
+});
