@@ -75,9 +75,7 @@ import {
   videoActive as selectVideoActive,
 } from "./features/programs/programService.js";
 import {
-  activeCoachNotes as selectActiveCoachNotes,
   addNoticeToUsers,
-  applyDismissCoachNote,
   createLocalNotice,
   markMessagesRead as markMessagesReadState,
   showBrowserNotification,
@@ -329,25 +327,6 @@ const isTaskActiveToday=(task,user)=>selectTaskActiveToday(task,user,todayKey())
 const addNotice=(userId,text,type="info")=>{
   if(!userId)return;
   DB.setUsers(addNoticeToUsers(DB.users(),userId,createLocalNotice({text,type,date:todayKey()})));
-};
-const activeCoachNotes=(client)=>selectActiveCoachNotes(client);
-const addCoachNote=(coach,clientIds,text)=>{
-  const clean=(text||"").trim();
-  if(!coach?.id||!clean||!clientIds?.length)return [];
-  const now=Date.now();
-  const time=new Date().toLocaleTimeString("tr",{hour:"2-digit",minute:"2-digit"});
-  const created=[];
-  DB.setUsers(DB.users().map(u=>{
-    if(!clientIds.includes(u.id))return u;
-    const note={id:`cn-${coach.id}-${u.id}-${now}`,coachId:coach.id,coachName:coach.name,text:clean,date:todayKey(),time,createdAt:now,read:false};
-    created.push({clientId:u.id,note});
-    return {...u,coachNotes:[note,...(u.coachNotes||[]).filter(n=>n.date===todayKey()).slice(0,9)]};
-  }));
-  return created;
-};
-const dismissCoachNote=(clientId,noteId)=>{
-  if(!clientId||!noteId)return;
-  DB.setUsers(applyDismissCoachNote(DB.users(),clientId,noteId));
 };
 const showLocalNotice=async(title,body)=>{
   await showBrowserNotification(title,body);

@@ -63,6 +63,7 @@ npm run doctor:production
 - Mesaj badge ozeti: tek/multiple gonderen icin okunabilir toplam ve son gonderen metadatasi
 - Mesaj navigasyon rozeti: okunmamis ozet metadata'sinin alt navigasyona tasinmasi
 - Koc mesaj inbox: okunmamis gonderen ozeti, danisan siralama ve sohbet acinca okundu senkronu
+- Koc notu eski App shell akisi: danisan ozetinde ikinci iletisim yuzeyi olusturmamasi icin temizlendi
 - Medya kaliciligi: lokal kayit, cloud upload, offline fallback ve signed URL yenileme
 - Kilo/olcum servisleri: gecersiz kilo korumasi, ilk kilo kaydi, kg format fallback ve vucut olcum normalize akisi
 - Koc dashboard ozet hesaplama
