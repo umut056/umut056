@@ -45,6 +45,7 @@ npm run doctor:production
 - Gunluk gorev state olusturma
 - Yeni gunde gorev state sifirlama
 - Tamamlanan gunluk gorevlerin aktif listeden dusmesi ve gun tamamlama kurali
+- Gunluk gorev sirasi: kalan gorev sayisi ve siradaki gorevin tek queue modelinden uretilmesi
 - Gunluk compliance ve bekleyen gorev hesaplama
 - Gorev alarm kurallari: aktif gorev filtresi, erteleme onceligi, 5 dakika gecikme toleransi ve izin uyarilari
 - Android alarm sesi: israrci native bildirim ve daha uzun WebView fallback tonu

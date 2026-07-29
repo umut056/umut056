@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Gunluk gorev kuyrugu kalan/tamamlanan/siradaki gorev modelini merkezi hale getirdi.
+
 - Koc aksiyon kutusu mesajlardan ayrilabilecek includeMessages filtresiyle guvenceye alindi.
 
 - Mesaj alt navigasyon rozeti kisi bazli okunmamis mesaj ozetiyle baglandi.

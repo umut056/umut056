@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dailyStateFor, dailyTasksComplete, mergeDailyUser, visibleDailyTasks } from "./dailyTaskService.js";
+import { dailyStateFor, dailyTaskQueue, dailyTasksComplete, mergeDailyUser, visibleDailyTasks } from "./dailyTaskService.js";
 
 describe("dailyTaskService", () => {
   it("creates a fresh daily state for the requested date", () => {
@@ -53,8 +53,10 @@ describe("dailyTaskService", () => {
     const state = { date: "2026-07-22", tasks: [true, false, true] };
 
     const visible = visibleDailyTasks(tasks, state);
+    const queue = dailyTaskQueue(tasks, state);
 
     expect(visible).toEqual([{ task: { title: "Shake" }, index: 1 }]);
+    expect(queue).toMatchObject({ total: 3, done: 2, pending: 1, next: { task: { title: "Shake" }, index: 1 } });
     expect(dailyTasksComplete(tasks, state)).toBe(false);
   });
 

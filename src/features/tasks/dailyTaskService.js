@@ -39,6 +39,21 @@ export function visibleDailyTasks(tasks = [], state = {}) {
     .filter(({ index }) => !checks[index]);
 }
 
+export function dailyTaskQueue(tasks = [], state = {}) {
+  const safeTasks = Array.isArray(tasks) ? tasks : [];
+  const checks = Array.isArray(state.tasks) ? state.tasks : [];
+  const visible = visibleDailyTasks(safeTasks, state);
+
+  return {
+    total: safeTasks.length,
+    done: safeTasks.filter((_, index) => !!checks[index]).length,
+    pending: visible.length,
+    visible,
+    next: visible[0] || null,
+  };
+}
+
 export function dailyTasksComplete(tasks = [], state = {}) {
-  return visibleDailyTasks(tasks, state).length === 0 && (Array.isArray(tasks) ? tasks.length : 0) > 0;
+  const queue = dailyTaskQueue(tasks, state);
+  return queue.pending === 0 && queue.total > 0;
 }
