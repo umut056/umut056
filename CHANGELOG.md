@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Gorev fotograf dili temizlendi; Android native alarm tekrar bildirimi donusumlu ID ile guclendirildi.
+
 - Rapor, profil, takvim ve mesaj ekranlarinda eksik allUsers verisi beyaz ekran olusturmasin diye ortak workspace guard eklendi.
 
 - Danisan ozetinden kaldirilan koc notu akisi App shell temizliginden gecirildi; legacy servis uyumlulugu korundu.

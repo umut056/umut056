@@ -40,7 +40,7 @@ export function applyCoachProofStatus({
   todayKey,
   getTaskPlan = () => [],
 }) {
-  let taskTitle = "Fotoğraf kanıtı";
+  let taskTitle = "Görev fotoğrafı";
 
   const nextUsers = asArray(users).map((user) => {
     if (user.id !== clientId) return user;

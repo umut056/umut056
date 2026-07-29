@@ -29,6 +29,7 @@ public class StepWiseAlarmReceiver extends BroadcastReceiver {
         String time = intent.getStringExtra("time");
         int alarmId = intent.getIntExtra("alarmId", 0);
         long repeatDelayMs = intent.getLongExtra("repeatDelayMs", DEFAULT_REPEAT_DELAY_MS);
+        int repeatCount = intent.getIntExtra("repeatCount", 0);
         if (!isSessionActiveForAlarms(context)) {
             MainActivity.StepWiseNative.cancelSingleTaskAlarm(context, alarmId);
             return;
@@ -93,7 +94,10 @@ public class StepWiseAlarmReceiver extends BroadcastReceiver {
 
         Notification alarmNotification = notification.build();
         alarmNotification.flags |= Notification.FLAG_INSISTENT;
-        manager.notify(44000 + alarmId, alarmNotification);
+        int notificationId = 44000 + alarmId + ((repeatCount % 2) * 1000);
+        int previousNotificationId = 44000 + alarmId + (((repeatCount + 1) % 2) * 1000);
+        manager.cancel(previousNotificationId);
+        manager.notify(notificationId, alarmNotification);
 
         Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
         if (vibrator != null) {
@@ -103,10 +107,10 @@ public class StepWiseAlarmReceiver extends BroadcastReceiver {
                 vibrator.vibrate(ALARM_VIBRATION_PATTERN, -1);
             }
         }
-        scheduleRepeatIfStillActive(context, alarmId, title, time, repeatDelayMs);
+        scheduleRepeatIfStillActive(context, alarmId, title, time, repeatDelayMs, repeatCount + 1);
     }
 
-    private void scheduleRepeatIfStillActive(Context context, int alarmId, String title, String time, long repeatDelayMs) {
+    private void scheduleRepeatIfStillActive(Context context, int alarmId, String title, String time, long repeatDelayMs, int repeatCount) {
         try {
             if (!isSessionActiveForAlarms(context)) return;
             if (!isAlarmStillActive(context, alarmId)) return;
@@ -119,6 +123,7 @@ public class StepWiseAlarmReceiver extends BroadcastReceiver {
             repeatIntent.putExtra("time", time);
             repeatIntent.putExtra("alarmId", alarmId);
             repeatIntent.putExtra("repeatDelayMs", repeatDelayMs);
+            repeatIntent.putExtra("repeatCount", repeatCount);
             PendingIntent pending = PendingIntent.getBroadcast(
                 context,
                 42000 + alarmId,

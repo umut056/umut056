@@ -111,7 +111,7 @@ const BANNED_FOODS = ["Sucuk", "Salam", "Pilav", "Makarna", "Beyaz ekmek", "Kız
 const PROGRAM_TEMPLATES = [
   {
     id:"six-foundation", name:"Maxi 6 Temel", desc:"3 gün atomlu, 2 gün atomsuz sabah kahvaltı akışı; shake, ara öğün, dengeli öğle ve erken akşam yemeği takibi", duration:"30 gün", variantNote:"Maxi takip", bannedFoods:BANNED_FOODS,
-    quickRules:["Sabah kalk, wc git, tartıl ve tartı fotoğrafını yükle", "07:00-10:00 arasındaki 3 içecek kahvaltıdır ve en geç 10:00'da bitmelidir", "Atomlu karışım 3 gün, atomsuz karışım 2 gün uygulanır", "Her görevde kamera kanıtı zorunludur"],
+    quickRules:["Sabah kalk, wc git, tartıl ve tartı fotoğrafını yükle", "07:00-10:00 arasındaki 3 içecek kahvaltıdır ve en geç 10:00'da bitmelidir", "Atomlu karışım 3 gün, atomsuz karışım 2 gün uygulanır", "Fotoğrafla tamamlanacak görevler kamera ile kaydedilir"],
     cautionNotes:["Öğle yemeğinde protein, karbonhidrat ve lif dengesi kurulmalı; yeşillik tercih değil, her öğünde zorunludur", "Akşam yemeği en geç 19:00'da bitmiş olmalıdır", "Maden suyunun sodyum değeri 100'ün altında olmalı ve ara öğünde içilmelidir", "Günlük sodyum ihtiyacını aşmamak için ürün etiketleri kontrol edilmelidir"],
     tasks:[
       {title:"Sabah tartısı ve fotoğraf", type:"photo_check", section:"Ölçüm", scheduledTime:"07:00", repeatType:"daily", repeatDays:[1,2,3,4,5,6,7], buttonLabel:"Fotoğraf Ekle", photoRequired:true, snoozeEnabled:false, snoozeOptions:[], note:"Sabah kalk, wc git, tartıl. Tartının fotoğrafını gruba/koça gönder."},
@@ -126,7 +126,7 @@ const PROGRAM_TEMPLATES = [
   },
   {
     id:"six-basic", name:"6 Temel Program", desc:"3 gün atomlu, 2 gün atomsuz temel kahvaltı karışımı; shake, çaylı ara öğünler, dengeli öğle ve erken akşam yemeği", duration:"30 gün", variantNote:"Temel takip", bannedFoods:BANNED_FOODS,
-    quickRules:["Sabah kalk, wc git, tartıl ve tartı fotoğrafını yükle", "07:00-10:00 arasındaki 3 içecek kahvaltıdır ve en geç 10:00'da bitmelidir", "Atomlu karışım 3 gün, atomsuz karışım 2 gün uygulanır", "Her görevde kamera kanıtı zorunludur"],
+    quickRules:["Sabah kalk, wc git, tartıl ve tartı fotoğrafını yükle", "07:00-10:00 arasındaki 3 içecek kahvaltıdır ve en geç 10:00'da bitmelidir", "Atomlu karışım 3 gün, atomsuz karışım 2 gün uygulanır", "Fotoğrafla tamamlanacak görevler kamera ile kaydedilir"],
     cautionNotes:["Öğle yemeğinde protein, karbonhidrat ve lif dengesi kurulmalı; yeşillik tercih değil, her öğünde zorunludur", "Akşam yemeği en geç 19:00'da bitmiş olmalıdır", "Maden suyunun sodyum değeri 100'ün altında olmalı ve ara öğünde içilmelidir", "Günlük sodyum ihtiyacını aşmamak için ürün etiketleri kontrol edilmelidir"],
     tasks:[
       {title:"Sabah tartısı ve fotoğraf", type:"photo_check", section:"Ölçüm", scheduledTime:"07:00", repeatType:"daily", repeatDays:[1,2,3,4,5,6,7], buttonLabel:"Fotoğraf Ekle", photoRequired:true, snoozeEnabled:false, snoozeOptions:[], note:"Sabah kalk, wc git, tartıl. Tartının fotoğrafını gruba/koça gönder."},
@@ -141,7 +141,7 @@ const PROGRAM_TEMPLATES = [
   },
   {
     id:"four-foundation", name:"4 Temel Program", desc:"Sabah Multifiber + Aloe Vera karışımı, shake, çaylı ara öğünler, dengeli öğle ve erken akşam yemeği", duration:"30 gün", variantNote:"Sade temel takip", bannedFoods:BANNED_FOODS,
-    quickRules:["Sabah kalk, wc git, tartıl ve tartı fotoğrafını yükle", "07:00-10:00 arasındaki kahvaltı karışımı ve shake en geç 10:00'da bitmelidir", "Her görevde kamera kanıtı zorunludur", "Akşam yemeği en geç 19:00'da bitmiş olmalıdır"], cautionNotes:["Öğle yemeğinde protein, karbonhidrat ve lif dengesi kurulmalı; yeşillik tercih değil, her öğünde zorunludur", "Yarım çiğ havuç serbesttir; pişmiş havuç tüketilmez", "Maden suyunun sodyum değeri 100'ün altında olmalı ve ara öğünde içilmelidir", "Günlük sodyum ihtiyacını aşmamak için ürün etiketleri kontrol edilmelidir"],
+    quickRules:["Sabah kalk, wc git, tartıl ve tartı fotoğrafını yükle", "07:00-10:00 arasındaki kahvaltı karışımı ve shake en geç 10:00'da bitmelidir", "Fotoğrafla tamamlanacak görevler kamera ile kaydedilir", "Akşam yemeği en geç 19:00'da bitmiş olmalıdır"], cautionNotes:["Öğle yemeğinde protein, karbonhidrat ve lif dengesi kurulmalı; yeşillik tercih değil, her öğünde zorunludur", "Yarım çiğ havuç serbesttir; pişmiş havuç tüketilmez", "Maden suyunun sodyum değeri 100'ün altında olmalı ve ara öğünde içilmelidir", "Günlük sodyum ihtiyacını aşmamak için ürün etiketleri kontrol edilmelidir"],
     tasks:[
       {title:"Sabah tartısı ve fotoğraf", type:"photo_check", section:"Ölçüm", scheduledTime:"07:00", repeatType:"daily", repeatDays:[1,2,3,4,5,6,7], buttonLabel:"Fotoğraf Ekle", photoRequired:true, snoozeEnabled:false, snoozeOptions:[], note:"Sabah kalk, wc git, tartıl. Tartının fotoğrafını gruba/koça gönder."},
       {title:"Sabah kahvaltı karışımı", type:"supplement", section:"Kahvaltı", scheduledTime:"07:15", repeatType:"daily", repeatDays:[1,2,3,4,5,6,7], buttonLabel:"İçtim", photoRequired:true, snoozeEnabled:true, snoozeOptions:[15,30], note:"07:00-10:00 kahvaltı: 500 ml suya 2 tatlı kaşığı Multifiber ve 4 kapak Aloe Vera ekle. Çalkala ve iç."},
@@ -166,7 +166,7 @@ const PROGRAM_TEMPLATES = [
     ]
   },
   {
-    id:"weight-gain", name:"Kilo Alma Programı", desc:"Bol yumurtalı kahvaltı, promax shake, zengin ana öğünler, yağlı kuruyemiş ara öğünü ve gece shake desteği", duration:"30 gün", variantNote:"Kilo alma", bannedFoods:["Paketli gıda", "Şekerli içecek", "Kızartma", "Aşırı kafein"], quickRules:["Her görevde kamera kanıtı zorunludur", "Ana öğünler zengin içerikli hazırlanır", "Promax shake sabah kahvaltıdan sonra ve gece yatmadan önce uygulanır", "Gece shake içildikten sonra uykuya geçilir"], cautionNotes:["İştah düşükse koça not bırakılır", "Hedef dışı ürün değişimi koçla yapılır", "Ara öğünde yağlı kuruyemişler öncelikli tüketilir"],
+    id:"weight-gain", name:"Kilo Alma Programı", desc:"Bol yumurtalı kahvaltı, promax shake, zengin ana öğünler, yağlı kuruyemiş ara öğünü ve gece shake desteği", duration:"30 gün", variantNote:"Kilo alma", bannedFoods:["Paketli gıda", "Şekerli içecek", "Kızartma", "Aşırı kafein"], quickRules:["Fotoğrafla tamamlanacak görevler kamera ile kaydedilir", "Ana öğünler zengin içerikli hazırlanır", "Promax shake sabah kahvaltıdan sonra ve gece yatmadan önce uygulanır", "Gece shake içildikten sonra uykuya geçilir"], cautionNotes:["İştah düşükse koça not bırakılır", "Hedef dışı ürün değişimi koçla yapılır", "Ara öğünde yağlı kuruyemişler öncelikli tüketilir"],
     tasks:[
       {title:"Bol yumurtalı kahvaltı", type:"meal", section:"Kahvaltı", scheduledTime:"08:00", repeatType:"daily", repeatDays:[1,2,3,4,5,6,7], buttonLabel:"Fotoğraf Ekle", photoRequired:true, snoozeEnabled:true, snoozeOptions:[15,30], note:"Bol yumurtalı, zengin içerikli kahvaltı yap. Kahvaltı fotoğrafını ekle."},
       {title:"Kahvaltı sonrası promax shake", type:"supplement", section:"Kahvaltı", scheduledTime:"09:00", repeatType:"daily", repeatDays:[1,2,3,4,5,6,7], buttonLabel:"İçtim", photoRequired:true, snoozeEnabled:true, snoozeOptions:[15,30], note:"Kahvaltıdan sonra: 300 ml süt + 200 ml suya 2 yemek kaşığı Promax, 2 kaşık shake, 1 adet muz, 1 avuç fındık ve 2 yemek kaşığı yulaf ekle. Robottan geçir ve iç."},
@@ -842,7 +842,7 @@ const CoachHome=({user,onNav,allUsers})=>{
   };
   return(
     <div style={{flex:1,overflowY:"auto",background:C.mist}}>
-      {previewProof&&<ImageLightbox media={previewProof} title={previewProof.client?.name||"Fotoğraf kanıtı"} subtitle={`${previewProof.task||"Görev"} · ${previewProof.time||""} · onay bekliyor${previewProof.note?` · Not: ${previewProof.note}`:""}`} onClose={()=>setPreviewProof(null)}/>}
+      {previewProof&&<ImageLightbox media={previewProof} title={previewProof.client?.name||"Görev fotoğrafı"} subtitle={`${previewProof.task||"Görev"} · ${previewProof.time||""} · onay bekliyor${previewProof.note?` · Not: ${previewProof.note}`:""}`} onClose={()=>setPreviewProof(null)}/>}
       <div style={{padding:"18px 18px 12px",position:"relative",overflow:"hidden"}}>
         <div style={{position:"absolute",right:-90,top:-120,width:270,height:270,borderRadius:"50%",background:"radial-gradient(circle,rgba(126,218,38,.22),rgba(255,255,255,0) 62%)",pointerEvents:"none"}}/>
         <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:14,position:"relative"}}>
@@ -909,7 +909,7 @@ const CoachHome=({user,onNav,allUsers})=>{
             </div>
             {proofActions.slice(0,4).map((p,i)=>(
               <div key={`${p.client.id}-${p.idx}-${p.id||i}`} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderTop:i?`1px solid rgba(232,160,32,.18)`:"none"}}>
-                {hasMediaImage(p)?<button onClick={()=>setPreviewProof(p)} style={{border:"none",background:"transparent",padding:0,width:48,height:48,borderRadius:14,overflow:"hidden",flexShrink:0,cursor:"pointer",boxShadow:"0 8px 18px rgba(13,61,43,.14)"}}><MediaImage media={p} alt="Fotoğraf kanıtı" style={{width:"100%",height:"100%",objectFit:"cover",display:"block",border:`1px solid ${C.mint}`}}/></button>:<Av ini={ini(p.client.name)} size={44}/>}
+                {hasMediaImage(p)?<button onClick={()=>setPreviewProof(p)} style={{border:"none",background:"transparent",padding:0,width:48,height:48,borderRadius:14,overflow:"hidden",flexShrink:0,cursor:"pointer",boxShadow:"0 8px 18px rgba(13,61,43,.14)"}}><MediaImage media={p} alt="Görev fotoğrafı" style={{width:"100%",height:"100%",objectFit:"cover",display:"block",border:`1px solid ${C.mint}`}}/></button>:<Av ini={ini(p.client.name)} size={44}/>}
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{fontSize:13,fontWeight:900,color:C.ink,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",...F}}>{p.client.name}</div>
                   <div style={{fontSize:11,color:C.stone,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",...F}}>{p.task} · {p.time||"şimdi"}</div>
@@ -1325,7 +1325,7 @@ const CoachReports=({user,allUsers})=>{
         <Card style={{padding:"4px 14px"}}>
           {logs.length===0?<div style={{padding:"14px 0",fontSize:12,color:C.stone,...F}}>Henüz görev hareketi yok.</div>:logs.map((l,i)=>{
             const client=clients.find(c=>c.id===l.clientId);
-            const label=l.action==="completed"?"tamamladı":l.action==="photo_uploaded"?"kanıt ekledi":l.action==="snoozed"?"erteledi":"güncelledi";
+            const label=l.action==="completed"?"tamamladı":l.action==="photo_uploaded"?"fotoğraf ekledi":l.action==="snoozed"?"erteledi":"güncelledi";
             return <div key={l.id} style={{padding:"11px 0",borderBottom:i<logs.length-1?`1px solid ${C.foam}`:"none",display:"flex",gap:10,alignItems:"center"}}><Av ini={ini(client?.name)} size={30}/><div style={{flex:1}}><div style={{fontSize:12,fontWeight:800,color:C.ink,...F}}>{client?.name||"Danışan"} {label}</div><div style={{fontSize:11,color:C.stone,...F}}>{l.taskTitle} · {l.time}{l.minutes?` · ${l.minutes} dk`:""}</div></div></div>;
           })}
         </Card>
@@ -1430,7 +1430,7 @@ const ClientHome=({user,onNav,allUsers})=>{
 
 const ClientTasks=({user,onUpdate})=>{
   if(!hasAssignedProgram(user)){
-    return <div style={{flex:1,overflowY:"auto",background:C.mist,padding:"28px 20px"}}><div style={{fontSize:11,color:C.stone,fontWeight:800,letterSpacing:.5,...F}}>GÖREVLER</div><div style={{fontSize:24,fontWeight:900,color:C.ink,marginBottom:18,...F}}>Bugün</div><Card style={{padding:"18px",border:`1.5px solid ${C.mint}`}}><div style={{fontSize:15,fontWeight:900,color:C.ink,marginBottom:6,...F}}>Henüz program atanmadı</div><div style={{fontSize:12,color:C.stone,lineHeight:1.45,...F}}>Koçun program atadığında günlük görevlerin, zorunlu fotoğraf alanların ve alarmların burada görünecek.</div></Card></div>;
+    return <div style={{flex:1,overflowY:"auto",background:C.mist,padding:"28px 20px"}}><div style={{fontSize:11,color:C.stone,fontWeight:800,letterSpacing:.5,...F}}>GÖREVLER</div><div style={{fontSize:24,fontWeight:900,color:C.ink,marginBottom:18,...F}}>Bugün</div><Card style={{padding:"18px",border:`1.5px solid ${C.mint}`}}><div style={{fontSize:15,fontWeight:900,color:C.ink,marginBottom:6,...F}}>Henüz program atanmadı</div><div style={{fontSize:12,color:C.stone,lineHeight:1.45,...F}}>Koçun program atadığında günlük görevlerin, fotoğrafla tamamlanan adımların ve alarmların burada görünecek.</div></Card></div>;
   }
   const template=user.programDraft||getTemplateByClient(user);
   const tasks=currentClientTasks(user);
@@ -1510,8 +1510,8 @@ const ClientTasks=({user,onUpdate})=>{
       {pm!==null&&<div style={{position:"absolute",inset:0,background:"rgba(10,31,22,.75)",display:"flex",alignItems:"flex-end",zIndex:100}}>
         <div style={{background:C.white,borderRadius:"24px 24px 0 0",padding:"20px 24px 32px",width:"100%",boxSizing:"border-box"}}>
           <div style={{width:40,height:4,background:C.pebble,borderRadius:2,margin:"0 auto 20px"}}/>
-          <div style={{fontSize:16,fontWeight:800,color:C.ink,marginBottom:4,...F}}>Kanıt Fotoğrafı</div>
-          <div style={{fontSize:13,color:C.stone,marginBottom:12,...F}}><b style={{color:C.emerald}}>{tasks[pm].l}</b> için kameradan gerçek fotoğraf çek</div>
+          <div style={{fontSize:16,fontWeight:800,color:C.ink,marginBottom:4,...F}}>Görev Fotoğrafı</div>
+          <div style={{fontSize:13,color:C.stone,marginBottom:12,...F}}><b style={{color:C.emerald}}>{tasks[pm].l}</b> için kameradan fotoğraf çek</div>
           <textarea value={note} onChange={e=>setNote(e.target.value)} placeholder="Not ekle..." style={{width:"100%",minHeight:64,boxSizing:"border-box",border:`1.5px solid ${C.mint}`,borderRadius:14,padding:"10px 12px",fontSize:13,outline:"none",resize:"vertical",color:C.ink,marginBottom:12,...F}}/>
           <input ref={cameraRef} type="file" accept="image/*" capture="environment" onChange={onCamera} style={{display:"none"}}/>
           <div style={{display:"flex",gap:10,marginBottom:16}}>

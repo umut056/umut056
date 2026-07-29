@@ -51,6 +51,8 @@ npm run doctor:production
 - Gorev alarm kurallari: aktif gorev filtresi, erteleme onceligi, 5 dakika gecikme toleransi ve izin uyarilari
 - Android alarm sesi: israrci native bildirim ve daha uzun WebView fallback tonu
 - Android alarm offline tekrar: aktif oturum korumasi, stale alarm temizligi ve native tekrar metadata akisi
+- Android alarm tekrar uyari hardening: ayni alarm icin donusumlu bildirim ID temizligi
+- Gorev/fotograf dili: kamera zorunlulugu davranisi korunurken "kanit/zorunlu fotograf" UI metinleri temizlendi
 - Koc fotograf onay kuyrugu: kapsam filtresi, danisan notu, onay/red/gizleme ve log olusturma
 - Koc-danisan mesaj filtresi
 - Grup/oda mesaj siralama

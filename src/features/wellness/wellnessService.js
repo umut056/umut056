@@ -118,7 +118,7 @@ export function wellnessModuleStatus(user = {}, date = todayIsoDate()) {
     {
       id: "photos",
       label: "Fotoğraf",
-      value: `${Object.keys(photoProofs).length} kanıt`,
+      value: `${Object.keys(photoProofs).length} fotoğraf`,
       score: clamp(Object.keys(photoProofs).length * 35),
     },
     {

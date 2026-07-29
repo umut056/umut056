@@ -183,6 +183,7 @@ public class MainActivity extends BridgeActivity {
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             if (notificationManager != null) {
                 notificationManager.cancel(44000 + id);
+                notificationManager.cancel(45000 + id);
             }
         }
 
@@ -203,6 +204,7 @@ public class MainActivity extends BridgeActivity {
                 }
                 if (notificationManager != null) {
                     notificationManager.cancel(44000 + i);
+                    notificationManager.cancel(45000 + i);
                 }
             }
         }
