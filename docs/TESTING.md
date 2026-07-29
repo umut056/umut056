@@ -39,6 +39,7 @@ npm run doctor:production
 - Program listesi tekillestirme
 - Program lifecycle: sistem sablonunu koca ozel kopyalama, satir parse etme, silme ve gizleme kurallari
 - Program atama modeli
+- Program kaydetme: duzenlenen programin atanmis danisanlara ve urun videosuna yansimasi
 - 3 gun atomlu / 2 gun atomsuz gorev dongusu normalizasyonu
 - Program videosunun atamaya eklenmesi
 - Gunluk gorev state olusturma

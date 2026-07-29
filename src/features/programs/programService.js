@@ -229,6 +229,44 @@ export function buildAssignedProgramClient({
   };
 }
 
+export function buildProgramSaveState({
+  program,
+  previousProgramId = program?.id,
+  programs = [],
+  users = [],
+  coachId,
+  date,
+  historyLimit = 8,
+}) {
+  if (!program?.id || !coachId) return { programs, users };
+
+  const savedPrograms = uniquePrograms([
+    ...programs.filter((item) => item.id !== previousProgramId && item.id !== program.id),
+    program,
+  ]);
+
+  return {
+    programs: savedPrograms,
+    users: users.map((user) => {
+      if (user?.programTemplateId !== previousProgramId && user?.programTemplateId !== program.id) return user;
+      if (user.coachId !== coachId) return user;
+      const activeTasks = normalizeProgramTasksForCycle(program.tasks || []).filter((task) =>
+        isTaskActiveToday(task, user, date),
+      );
+      return buildAssignedProgramClient({
+        client: user,
+        template: program,
+        activeTasks,
+        productVideo: programVideoForAssignment(program, date),
+        date,
+        historyLimit,
+        keepTaskChecks: true,
+        keepProgress: true,
+      });
+    }),
+  };
+}
+
 export function normalizeProgramTasksForCycle(tasks = []) {
   return tasks.map((task) => {
     const text = `${task.title || ""} ${task.note || ""}`.toLocaleLowerCase("tr-TR");

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Program kaydetme akisi servis seviyesinde atanmis danisanlara ve urun videosuna yansitilacak sekilde guvenceye alindi.
+
 - Rapor ve ilerleme ekranlari icin eksik/bozuk vucut olcumu degerleri normalize edildi.
 
 - Mesaj bildirimleri icin gonderen ve toplam okunmamis mesaj ozeti servis seviyesinde eklendi.

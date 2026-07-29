@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildAssignedProgramClient,
   buildProgramRemovalState,
+  buildProgramSaveState,
   displayProgram,
   editableProgramForCoach,
   normalizeProgramTasksForCycle,
@@ -148,5 +149,60 @@ describe("programService", () => {
 
     expect(state.programs).toEqual([{ id: "system-1" }]);
     expect(state.users[0].hiddenProgramIds).toEqual(["old", "system-1"]);
+  });
+
+  it("saves edited coach programs and refreshes assigned client drafts with video", () => {
+    const state = buildProgramSaveState({
+      previousProgramId: "custom-1",
+      coachId: "coach-1",
+      date: "2026-07-22",
+      programs: [{ id: "custom-1", coachId: "coach-1", name: "Old Program" }],
+      users: [
+        { id: "coach-1", role: "coach" },
+        {
+          id: "client-1",
+          role: "client",
+          coachId: "coach-1",
+          programTemplateId: "custom-1",
+          tasks: [true, false],
+          compliance: 50,
+          programHistory: [],
+        },
+        {
+          id: "client-2",
+          role: "client",
+          coachId: "coach-2",
+          programTemplateId: "custom-1",
+          tasks: [true],
+        },
+      ],
+      program: {
+        id: "custom-1",
+        coachId: "coach-1",
+        name: "Updated Program",
+        desc: "Updated",
+        duration: "30 gun",
+        tasks: [
+          { title: "Atomlu kahvalti", scheduledTime: "07:15" },
+          { title: "Ogle yemegi", scheduledTime: "12:30" },
+        ],
+        productVideo: { mediaId: "video-1", name: "Kullanim videosu" },
+      },
+    });
+
+    expect(state.programs).toHaveLength(1);
+    expect(state.programs[0].name).toBe("Updated Program");
+
+    const client = state.users.find((user) => user.id === "client-1");
+    expect(client.program).toBe("Updated Program");
+    expect(client.programDraft.name).toBe("Updated Program");
+    expect(client.productVideo).toMatchObject({
+      mediaId: "video-1",
+      sourceProgramId: "custom-1",
+      assignedAt: "2026-07-22",
+    });
+    expect(client.compliance).toBe(50);
+
+    expect(state.users.find((user) => user.id === "client-2").program).toBeUndefined();
   });
 });
