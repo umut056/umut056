@@ -87,7 +87,7 @@ import {
 } from "./features/notifications/notificationService.js";
 import { mergeCloudUsersWithLocal, mergeMessages, normalizeUserDefaults, normalizeUsers } from "./features/sync/workspaceService.js";
 import { isTaskOverdue, reminderPermissionWarnings } from "./features/tasks/taskAlarmService.js";
-import { dailyStateFor, mergeDailyUser } from "./features/tasks/dailyTaskService.js";
+import { dailyStateFor, dailyTaskQueue, mergeDailyUser } from "./features/tasks/dailyTaskService.js";
 import { buildWeightUpdate } from "./features/weight/weightService.js";
 import {
   getWellnessDay,
@@ -422,6 +422,13 @@ const currentPendingCount=(user)=>{
   const tasks=currentClientTasks(user);
   if(!tasks.length)return 0;
   return dailyStateFor(user,tasks).tasks.filter(x=>!x).length;
+};
+const currentCompliance=(user)=>{
+  const tasks=currentClientTasks(user);
+  if(!tasks.length)return 0;
+  const state=dailyStateFor(user,tasks);
+  const done=(state.tasks||[]).filter(Boolean).length;
+  return Math.round((done/(tasks.length||1))*100);
 };
 const authUser=(email,password)=>authenticateUser({email,password,users:DB.users(),seedUsers:SEED_USERS,setUsers:DB.setUsers});
 
@@ -842,6 +849,7 @@ const CoachHome=({user,onNav,allUsers})=>{
     users:liveUsers,
     hasAssignedProgram,
     currentPendingCount,
+    currentCompliance,
     coachProofActions,
     isRiskClient,
   });
@@ -1508,8 +1516,9 @@ const ClientTasks=({user,onUpdate})=>{
   useEffect(()=>{const id=setInterval(()=>setTick(Date.now()),30000);return()=>clearInterval(id);},[]);
   useEffect(()=>{scheduleNativeAlarms(tasks,checks,snoozed);},[user.id,template.name]);
   useEffect(()=>{if(overdue)playAlarmTone();},[tick,overdue?.idx]);
-  const done=checks.filter(Boolean).length;const pct=Math.round((done/(tasks.length||1))*100);
-  const visibleTasks=tasks.map((t,i)=>({t,i})).filter(({i})=>!checks[i]);
+  const taskQueue=dailyTaskQueue(tasks,{tasks:checks,photoProofs:proofs,snoozedTasks:snoozed,note});
+  const done=taskQueue.done;const pct=Math.round((done/(taskQueue.total||1))*100);
+  const visibleTasks=taskQueue.visible.map(({task,index})=>({t:task,i:index}));
   return(
     <div style={{display:"flex",flexDirection:"column",height:"100%",background:C.mist,position:"relative"}}>
       {previewProof&&<ImageLightbox media={previewProof.media} title={previewProof.title} subtitle={previewProof.subtitle} onClose={()=>setPreviewProof(null)}/>}
@@ -1545,9 +1554,9 @@ const ClientTasks=({user,onUpdate})=>{
         </div>
       </div>
       <div style={{flex:1,overflowY:"auto",padding:"14px 16px"}}>
-        <div style={{background:"#fff8ec",border:`1.5px solid #ffe0a0`,borderRadius:14,padding:"10px 14px",marginBottom:14,display:"flex",gap:8,alignItems:"flex-start"}}>
+        {visibleTasks.length>0&&<div style={{background:"#fff8ec",border:`1.5px solid #ffe0a0`,borderRadius:14,padding:"10px 14px",marginBottom:14,display:"flex",gap:8,alignItems:"flex-start"}}>
           <Ico d={IC.alarm} size={16} color={C.warn}/><div style={{fontSize:12,color:"#a07000",display:"grid",gap:3,...F}}>{visibleTasks.slice(0,3).map(({t})=><div key={`${t.idx}-${t.l}`}>{t.alarm} · {t.l}</div>)}</div>
-        </div>
+        </div>}
         <button onClick={enableReminders} style={{width:"100%",border:"none",background:C.mint,color:C.emerald,borderRadius:14,padding:"10px 12px",fontSize:12,fontWeight:800,marginBottom:10,...F}}>Bugünkü Hatırlatmaları Aç</button>
         {reminderInfo&&<div style={{fontSize:11,color:C.stone,margin:"-4px 0 10px",textAlign:"center",...F}}>{reminderInfo}</div>}
         {overdue&&<div style={{background:"#fde8e6",border:"1.5px solid #f7b4ac",borderRadius:14,padding:"11px 14px",marginBottom:12,color:C.risk,fontSize:12,fontWeight:800,lineHeight:1.35,...F}}>Hatırlatma: {overdue.l} süresi geçti. Görevi tamamlayabilir veya kalan erteleme hakkını kullanabilirsin.</div>}

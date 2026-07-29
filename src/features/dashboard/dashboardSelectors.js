@@ -5,6 +5,7 @@ export function getCoachDashboardSummary({
   users = [],
   hasAssignedProgram = () => false,
   currentPendingCount = () => 0,
+  currentCompliance = (client) => client.compliance || 0,
   coachProofActions = () => [],
   isRiskClient = () => false,
 }) {
@@ -12,7 +13,7 @@ export function getCoachDashboardSummary({
   const assignedClients = clients.filter(hasAssignedProgram);
   const avg = assignedClients.length
     ? Math.round(
-        assignedClients.reduce((total, client) => total + (client.compliance || 0), 0) /
+        assignedClients.reduce((total, client) => total + (currentCompliance(client) || 0), 0) /
           assignedClients.length,
       )
     : 0;

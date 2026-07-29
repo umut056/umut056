@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Gunluk gorev listesi tek queue modeline baglandi; tamamlanan gorevler listeden duser ve koc uyumu bugunku state ile hesaplanir.
+
 - Koc mesaj ekranina okunmamis gonderen ozeti ve okunmamis danisanlari uste tasiyan inbox davranisi eklendi.
 
 - Alarm planlama aktif oturum kontrolu, stale alarm temizligi ve offline tekrar metadata akisi ile guclendirildi.

@@ -32,6 +32,24 @@ describe("dashboardSelectors", () => {
     expect(summary.riskClients.map((client) => client.id)).toEqual(["client-2"]);
   });
 
+  it("can calculate coach average from the current daily state instead of stale client compliance", () => {
+    const summary = getCoachDashboardSummary({
+      coach: { id: "coach-1" },
+      users: [
+        { id: "coach-1", role: "coach" },
+        { id: "client-1", role: "client", coachId: "coach-1", compliance: 80 },
+      ],
+      hasAssignedProgram: () => true,
+      currentPendingCount: () => 2,
+      currentCompliance: () => 0,
+      coachProofActions: () => [],
+      isRiskClient: () => false,
+    });
+
+    expect(summary.avg).toBe(0);
+    expect(summary.activeTasks).toBe(2);
+  });
+
   it("summarizes client progress without undefined weight values", () => {
     const summary = getClientDashboardSummary({
       client: { body: { start: 72, current: 67.5, target: 63 } },
