@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Koc aksiyon kutusu mesajlardan ayrilabilecek includeMessages filtresiyle guvenceye alindi.
+
 - Mesaj alt navigasyon rozeti kisi bazli okunmamis mesaj ozetiyle baglandi.
 
 - Program kaydetme akisi servis seviyesinde atanmis danisanlara ve urun videosuna yansitilacak sekilde guvenceye alindi.

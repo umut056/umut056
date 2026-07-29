@@ -146,4 +146,19 @@ describe("notificationService unread messages", () => {
     });
     expect(inbox[2].text).toContain("Elif");
   });
+
+  it("can keep coach action inbox free of message items", () => {
+    const inbox = coachActionInbox({
+      coachId: "coach-1",
+      includeMessages: false,
+      users: [
+        { id: "coach-1", role: "coach", name: "Test Koc" },
+        { id: "client-1", role: "client", name: "Elif" },
+      ],
+      messages: [{ id: "m1", from: "client-1", to: "coach-1", text: "Merhaba", readBy: [] }],
+      proofActions: [{ id: "p1", client: { id: "client-1", name: "Elif" }, task: "Sabah tartisi" }],
+    });
+
+    expect(inbox.map((item) => item.type)).toEqual(["proof"]);
+  });
 });

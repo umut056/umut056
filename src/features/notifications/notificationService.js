@@ -79,11 +79,12 @@ export function coachActionInbox({
   appointments = [],
   proofActions = [],
   getPreviewText = null,
+  includeMessages = true,
 }) {
   if (!coachId) return [];
 
   const userById = new Map(asArray(users).map((user) => [user.id, user]));
-  const messageItems = unreadConversationSummaries(messages, coachId, asArray(users), getPreviewText).map((summary) => ({
+  const messageItems = includeMessages ? unreadConversationSummaries(messages, coachId, asArray(users), getPreviewText).map((summary) => ({
     id: `message-${summary.senderId}`,
     type: "message",
     priority: 80,
@@ -94,7 +95,7 @@ export function coachActionInbox({
     count: summary.count,
     time: summary.lastTime,
     source: summary.lastMessage,
-  }));
+  })) : [];
 
   const proofItems = asArray(proofActions).map((proof, index) => ({
     id: `proof-${proof.id || proof.client?.id || index}`,
