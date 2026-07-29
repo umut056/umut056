@@ -52,6 +52,26 @@ export function unreadConversationSummaries(messages = [], userId, participants 
   return [...grouped.values()].sort((a, b) => (b.lastMessage?.createdAt || 0) - (a.lastMessage?.createdAt || 0));
 }
 
+export function unreadMessageBadge(messages = [], userId, participants = []) {
+  const summaries = unreadConversationSummaries(messages, userId, participants);
+  const total = summaries.reduce((count, summary) => count + summary.count, 0);
+  const senderCount = summaries.length;
+  const topSender = summaries[0] || null;
+
+  return {
+    total,
+    senderCount,
+    topSenderId: topSender?.senderId || null,
+    topSenderName: topSender?.senderName || "",
+    label:
+      total <= 0
+        ? ""
+        : senderCount === 1
+          ? `${topSender.senderName}: ${total}`
+          : `${senderCount} kişi · ${total} mesaj`,
+  };
+}
+
 export function coachActionInbox({
   coachId,
   users = [],

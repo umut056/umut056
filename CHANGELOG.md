@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Mesaj bildirimleri icin gonderen ve toplam okunmamis mesaj ozeti servis seviyesinde eklendi.
+
 - Android gorev alarmlari israrci bildirimle guclendirildi ve WebView fallback alarm tonu uzatildi.
 
 - Gunluk gorevlerde tamamlanan maddelerin aktif listeden dusmesi ve gun tamamlama kurali testle sabitlendi.

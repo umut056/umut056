@@ -5,6 +5,7 @@ import {
   unreadConversationSummaries,
   unreadCount,
   unreadCountFrom,
+  unreadMessageBadge,
   unreadMessagesFor,
 } from "./notificationService.js";
 
@@ -44,6 +45,34 @@ describe("notificationService unread messages", () => {
       senderName: "Elif Yilmaz",
       count: 1,
       lastText: "Sesli mesaj",
+    });
+  });
+
+  it("builds a readable unread badge summary for coach navigation", () => {
+    expect(
+      unreadMessageBadge(messages, "coach-1", [
+        { id: "client-1", name: "Mert Demir" },
+        { id: "client-2", name: "Elif Yilmaz" },
+      ]),
+    ).toEqual({
+      total: 3,
+      senderCount: 2,
+      topSenderId: "client-1",
+      topSenderName: "Mert Demir",
+      label: "2 kişi · 3 mesaj",
+    });
+
+    expect(
+      unreadMessageBadge(
+        messages.filter((message) => message.from !== "client-2"),
+        "coach-1",
+        [{ id: "client-1", name: "Mert Demir" }],
+      ),
+    ).toMatchObject({
+      total: 2,
+      senderCount: 1,
+      topSenderName: "Mert Demir",
+      label: "Mert Demir: 2",
     });
   });
 
