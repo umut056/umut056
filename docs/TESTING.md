@@ -68,6 +68,7 @@ npm run doctor:production
 - V2 wellness dashboard: danisan health score, koc komuta ozeti, wellness modul skorlari ve su/beslenme/aktivite kayit servisleri
 - Profil patch: offline/local kayit, cloud merge, cloud hata fallback ve eksik id korumasi
 - Auth registration: rol, ref kodu, aktivasyon kodu ve lokal danisan varsayilanlari
+- Hazir test hesaplari: login kartlari, seed e-posta/sifreleri ve auth repair akisi tek kaynakta dogrulanir
 - Danisan dashboard ilerleme hesaplama
 - Android alarm hardening: native kanal surumu, tekrar araligi ve kilit ekrani manuel test akisi
 - Cloud/local workspace merge: program, vucut olcumu, gunluk ilerleme ve urun videosu koruma
