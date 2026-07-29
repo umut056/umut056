@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  dashboardWeightText,
   getCoachDashboardSummary,
   getCoachV2Snapshot,
   getClientDashboardSummary,
@@ -7,6 +8,12 @@ import {
 } from "./dashboardSelectors.js";
 
 describe("dashboardSelectors", () => {
+  it("formats empty dashboard weights without leaking undefined text", () => {
+    expect(dashboardWeightText(undefined)).toBe("Henüz girilmedi");
+    expect(dashboardWeightText("bad")).toBe("Henüz girilmedi");
+    expect(dashboardWeightText(67.5)).toBe("67.5 kg");
+  });
+
   it("summarizes coach clients and active work", () => {
     const users = [
       { id: "coach-1", role: "coach" },

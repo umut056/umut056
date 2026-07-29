@@ -72,6 +72,8 @@ npm run doctor:production
 - Koc rapor selectorlari: eksik veri ve kapsamli danisan filtreleme regression testi
 - Workspace kullanici guard'i: rapor, profil, takvim ve mesaj ekranlarinda eksik allUsers prop'u beyaz ekran olusturmaz
 - Rapor/ilerleme body guard: eksik ve bozuk vucut olcumu degerlerini normalize etme
+- Oturum restore guard'i: workspace kullanicilari gec gelirse kayitli oturum korunur ve alarm iptali tetiklenmez
+- Dashboard kilo metni: eksik kilo verisi ekrana undefined olarak sizmaz
 - V2 wellness dashboard: danisan health score, koc komuta ozeti, wellness modul skorlari ve su/beslenme/aktivite kayit servisleri
 - Profil patch: offline/local kayit, cloud merge, cloud hata fallback ve eksik id korumasi
 - Auth registration: rol, ref kodu, aktivasyon kodu ve lokal danisan varsayilanlari

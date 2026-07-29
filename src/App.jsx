@@ -1301,7 +1301,7 @@ const CoachReports=({user,allUsers})=>{
         </Card>
         <div style={{fontSize:13,fontWeight:700,color:C.ink,margin:"0 0 10px",...F}}>Güncel Kilo Girişi</div>
         <Card style={{padding:"4px 14px",marginBottom:16}}>
-          {clients.length===0?<div style={{padding:"14px 0",fontSize:12,color:C.stone,...F}}>Bu koça bağlı danışan bulunamadı.</div>:clients.map((c,i)=>{const d=weightDelta(c.body||{});return <div key={c.id} style={{padding:"11px 0",borderBottom:i<clients.length-1?`1px solid ${C.foam}`:"none",display:"flex",gap:8,alignItems:"center"}}><Av ini={ini(c.name)} size={30}/><div style={{flex:1}}><div style={{fontSize:12,fontWeight:800,color:C.ink,...F}}>{c.name}</div><div style={{fontSize:11,color:C.stone,...F}}>Güncel {c.body?.current||0} kg · Değişim {d>0?`-${d}`:d<0?`+${Math.abs(d)}`:"0"} kg</div></div><input type="number" placeholder="kg" value={weightDraft[c.id]??""} onChange={e=>setWeightDraft(w=>({...w,[c.id]:e.target.value}))} style={{width:58,border:`1.5px solid ${C.mint}`,borderRadius:10,padding:"8px",fontSize:12,color:C.ink,...F}}/><button onClick={()=>saveWeight(c)} style={{border:"none",background:C.mint,color:C.emerald,borderRadius:10,padding:"8px 9px",fontSize:11,fontWeight:800,...F}}>Kaydet</button></div>})}
+          {clients.length===0?<div style={{padding:"14px 0",fontSize:12,color:C.stone,...F}}>Bu koça bağlı danışan bulunamadı.</div>:clients.map((c,i)=>{const body=normalizeBody(c.body);const d=weightDelta(body);return <div key={c.id} style={{padding:"11px 0",borderBottom:i<clients.length-1?`1px solid ${C.foam}`:"none",display:"flex",gap:8,alignItems:"center"}}><Av ini={ini(c.name)} size={30}/><div style={{flex:1}}><div style={{fontSize:12,fontWeight:800,color:C.ink,...F}}>{c.name}</div><div style={{fontSize:11,color:C.stone,...F}}>Güncel {dashboardWeightText(body.current)} · Değişim {d>0?`-${d}`:d<0?`+${Math.abs(d)}`:"0"} kg</div></div><input type="number" placeholder="kg" value={weightDraft[c.id]??""} onChange={e=>setWeightDraft(w=>({...w,[c.id]:e.target.value}))} style={{width:58,border:`1.5px solid ${C.mint}`,borderRadius:10,padding:"8px",fontSize:12,color:C.ink,...F}}/><button onClick={()=>saveWeight(c)} style={{border:"none",background:C.mint,color:C.emerald,borderRadius:10,padding:"8px 9px",fontSize:11,fontWeight:800,...F}}>Kaydet</button></div>})}
         </Card>
         <div style={{fontSize:13,fontWeight:700,color:C.ink,marginBottom:10,...F}}>Danışan Sıralaması</div>
         <Card>
@@ -1921,6 +1921,7 @@ const AlarmPermissionCard=()=>{
 const ProfileScreen=({user,allUsers,onUpdate,onLogout})=>{
   user=normalizeUserDefaults(DB.users().find(u=>u.id===user.id)||user||{});
   const isCoach=user.role==="coach";
+  const profileBody=normalizeBody(user.body);
   const [editing,setEditing]=useState(false);
   const [form,setForm]=useState({name:user.name||"",email:user.email||"",phone:user.phone||""});
   const prefTasks=isCoach?[]:currentClientTasks(user);
@@ -2056,7 +2057,7 @@ const ProfileScreen=({user,allUsers,onUpdate,onLogout})=>{
           <Card style={{padding:"16px",marginBottom:14}}>
             <div style={{fontSize:11,color:C.emerald,fontWeight:950,letterSpacing:.6,marginBottom:10,...F}}>V2 WELLNESS PROFİLİ</div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
-              {[{l:"Program",v:displayProgram(user),c:C.emerald},{l:"Hedef",v:dashboardWeightText(user.body?.target),c:C.blue},{l:"Seri",v:`${user.streakDays||0} gün`,c:C.warn}].map(x=><div key={x.l} style={{background:C.foam,borderRadius:15,padding:"11px",minHeight:58}}><div style={{fontSize:10,color:C.stone,fontWeight:850,marginBottom:5,...F}}>{x.l}</div><div style={{fontSize:13,fontWeight:950,color:x.c,lineHeight:1.15,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",...F}}>{x.v}</div></div>)}
+              {[{l:"Program",v:displayProgram(user),c:C.emerald},{l:"Hedef",v:dashboardWeightText(profileBody.target),c:C.blue},{l:"Seri",v:`${user.streakDays||0} gün`,c:C.warn}].map(x=><div key={x.l} style={{background:C.foam,borderRadius:15,padding:"11px",minHeight:58}}><div style={{fontSize:10,color:C.stone,fontWeight:850,marginBottom:5,...F}}>{x.l}</div><div style={{fontSize:13,fontWeight:950,color:x.c,lineHeight:1.15,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",...F}}>{x.v}</div></div>)}
             </div>
             <div style={{fontSize:12,color:C.ink,fontWeight:800,lineHeight:1.4,marginTop:12,...F}}>Profilin artık sadece ayar değil; hedef, program, ölçüm ve güvenlik merkezidir. Program atanınca saat tercihleri ve alarm izinleri buradan yönetilir.</div>
           </Card>

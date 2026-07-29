@@ -14,8 +14,8 @@ export function restoreStoredUser(users = []) {
         saveSession(sessionUser);
         return sessionUser;
       }
-      clearSession();
-      return null;
+      saveSession(sessionUser);
+      return sessionUser;
     }
 
     const restored = {
