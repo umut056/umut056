@@ -68,6 +68,7 @@ npm run doctor:production
 - Kilo/olcum servisleri: gecersiz kilo korumasi, ilk kilo kaydi, kg format fallback ve vucut olcum normalize akisi
 - Koc dashboard ozet hesaplama
 - Koc rapor selectorlari: eksik veri ve kapsamli danisan filtreleme regression testi
+- Workspace kullanici guard'i: rapor, profil, takvim ve mesaj ekranlarinda eksik allUsers prop'u beyaz ekran olusturmaz
 - Rapor/ilerleme body guard: eksik ve bozuk vucut olcumu degerlerini normalize etme
 - V2 wellness dashboard: danisan health score, koc komuta ozeti, wellness modul skorlari ve su/beslenme/aktivite kayit servisleri
 - Profil patch: offline/local kayit, cloud merge, cloud hata fallback ve eksik id korumasi

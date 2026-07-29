@@ -324,6 +324,7 @@ const taskCycleIndexFor=(user)=>{
   return (daysBetween(start)-1)%5;
 };
 const isTaskActiveToday=(task,user)=>selectTaskActiveToday(task,user,todayKey());
+const workspaceUsers=(users)=>Array.isArray(users)?users:DB.users();
 const addNotice=(userId,text,type="info")=>{
   if(!userId)return;
   DB.setUsers(addNoticeToUsers(DB.users(),userId,createLocalNotice({text,type,date:todayKey()})));
@@ -945,7 +946,8 @@ const CoachClients=({user,allUsers,onUpdate})=>{
   const [form,setForm]=useState({name:"",email:"",phone:"",goal:"",programStartDate:todayKey(),programEndDate:"",password:"client123"});
   const [err,setErr]=useState("");
   useBackClose(adding,()=>setAdding(false));
-  const clients=allUsers.filter(u=>u.role==="client"&&u.coachId===user.id);
+  const users=workspaceUsers(allUsers);
+  const clients=users.filter(u=>u.role==="client"&&u.coachId===user.id);
   const banned=clients.filter(c=>c.status==="banned");
   const fil=clients.filter(c=>{
     const mq=c.name.toLowerCase().includes(q.toLowerCase())||c.email.toLowerCase().includes(q.toLowerCase())||(c.goal||"").toLowerCase().includes(q.toLowerCase());
@@ -1074,7 +1076,8 @@ const CoachClients=({user,allUsers,onUpdate})=>{
 const CoachMsgs=({user,allUsers})=>{
   const [sel,setSel]=useState(null);const [msg,setMsg]=useState("");const [mediaOpen,setMediaOpen]=useState(false);const [,forceUpdate]=useState(0);
   const [enabled,setEnabled]=useState(user.clientMessagesOpen!==false);
-  const clients=allUsers.filter(u=>u.role==="client"&&u.coachId===user.id);
+  const users=workspaceUsers(allUsers);
+  const clients=users.filter(u=>u.role==="client"&&u.coachId===user.id);
   const ref=useRef();const photoRef=useRef(null);const recRef=useRef(null);const chunksRef=useRef([]);const [recording,setRecording]=useState(false);const [voiceDraft,setVoiceDraft]=useState(null);const [recordSeconds,setRecordSeconds]=useState(0);
   const canSend=enabled;
   const unreadSummaries=selectUnreadConversationSummaries(DB.msgs(),user.id,clients,messagePreviewText);
@@ -1156,7 +1159,8 @@ const CoachMsgs=({user,allUsers})=>{
 const CoachGroupChat=({user,allUsers})=>{
   const [msg,setMsg]=useState("");const [,forceUpdate]=useState(0);
   const ref=useRef();const photoRef=useRef(null);const audioRef=useRef(null);
-  const coaches=allUsers.filter(u=>u.role==="coach");
+  const users=workspaceUsers(allUsers);
+  const coaches=users.filter(u=>u.role==="coach");
   const list=()=>roomMessages(DB.msgs(),"coaches");
   const pushMsg=async(extra)=>{const record=await createMessageRecord({user,room:"coaches",extra,logLabel:"cloud-group-message"});DB.setMsgs([...DB.msgs(),record]);forceUpdate(n=>n+1);};
   const send=()=>{if(!msg.trim())return;pushMsg({text:msg.trim(),kind:"text"});setMsg("");};
@@ -1165,7 +1169,7 @@ const CoachGroupChat=({user,allUsers})=>{
   useEffect(()=>ref.current?.scrollIntoView({behavior:"smooth"}),[msg]);
   return <div style={{display:"flex",flexDirection:"column",height:"100%",background:C.mist}}>
     <div style={{background:"rgba(255,255,255,.74)",padding:"8px 20px 16px",borderBottom:"1px solid rgba(255,255,255,.78)",backdropFilter:"blur(14px)"}}><div style={{fontSize:11,color:C.stone,fontWeight:600,letterSpacing:.5,...F}}>KOÇ SOHBETİ</div><div style={{fontSize:22,fontWeight:800,color:C.ink,...F}}>Koçlar Arası</div><div style={{fontSize:11,color:C.stone,marginTop:5,...F}}>{coaches.length} koç bu ortak alana erişebilir. Danışanlar göremez.</div></div>
-    <div style={{flex:1,overflowY:"auto",padding:"16px",display:"flex",flexDirection:"column",gap:10}}>{list().length===0&&<div style={{textAlign:"center",padding:"36px 18px",color:C.stone,fontSize:13,...F}}>Henüz koç mesajı yok.</div>}{list().map((m,i)=>{const isMe=m.from===user.id;const sender=allUsers.find(u=>u.id===m.from);return <div key={i} style={{display:"flex",justifyContent:isMe?"flex-end":"flex-start",alignItems:"flex-end",gap:8}}>{!isMe&&<Av ini={ini(sender?.name)} size={28} bg={C.forest} fg={C.white}/>}<div style={{background:isMe?C.emerald:C.white,color:isMe?C.white:C.ink,borderRadius:isMe?"20px 20px 4px 20px":"20px 20px 20px 4px",padding:"10px 14px",maxWidth:"76%",fontSize:13,lineHeight:1.5,boxShadow:"0 1px 6px rgba(13,61,43,.08)",...F}}>{!isMe&&<div style={{fontSize:10,fontWeight:900,color:C.emerald,marginBottom:4,...F}}>{sender?.name||"Koç"}</div>}{renderMsg(m)}<div style={{fontSize:10,opacity:.55,marginTop:4,textAlign:"right"}}>{m.time}</div></div>{isMe&&<Av ini={ini(user.name)} size={28} bg={C.emerald} fg={C.white}/>}</div>})}<div ref={ref}/></div>
+    <div style={{flex:1,overflowY:"auto",padding:"16px",display:"flex",flexDirection:"column",gap:10}}>{list().length===0&&<div style={{textAlign:"center",padding:"36px 18px",color:C.stone,fontSize:13,...F}}>Henüz koç mesajı yok.</div>}{list().map((m,i)=>{const isMe=m.from===user.id;const sender=users.find(u=>u.id===m.from);return <div key={i} style={{display:"flex",justifyContent:isMe?"flex-end":"flex-start",alignItems:"flex-end",gap:8}}>{!isMe&&<Av ini={ini(sender?.name)} size={28} bg={C.forest} fg={C.white}/>}<div style={{background:isMe?C.emerald:C.white,color:isMe?C.white:C.ink,borderRadius:isMe?"20px 20px 4px 20px":"20px 20px 20px 4px",padding:"10px 14px",maxWidth:"76%",fontSize:13,lineHeight:1.5,boxShadow:"0 1px 6px rgba(13,61,43,.08)",...F}}>{!isMe&&<div style={{fontSize:10,fontWeight:900,color:C.emerald,marginBottom:4,...F}}>{sender?.name||"Koç"}</div>}{renderMsg(m)}<div style={{fontSize:10,opacity:.55,marginTop:4,textAlign:"right"}}>{m.time}</div></div>{isMe&&<Av ini={ini(user.name)} size={28} bg={C.emerald} fg={C.white}/>}</div>})}<div ref={ref}/></div>
     <div style={{padding:"10px 16px 12px",background:C.white,borderTop:`1px solid ${C.mint}`}}><input ref={photoRef} type="file" accept="image/*" onChange={e=>sendFile(e,"photo")} style={{display:"none"}}/><input ref={audioRef} type="file" accept="audio/*" onChange={e=>sendFile(e,"audio")} style={{display:"none"}}/><div style={{display:"flex",gap:8,alignItems:"flex-end"}}><button onClick={()=>photoRef.current?.click()} style={{border:"none",background:C.blueBg,color:C.blue,borderRadius:14,padding:"12px 10px",fontSize:11,fontWeight:800,...F}}>Foto</button><button onClick={()=>audioRef.current?.click()} style={{border:"none",background:C.mint,color:C.emerald,borderRadius:14,padding:"12px 10px",fontSize:11,fontWeight:800,...F}}>Ses</button><div style={inputShellStyle()}><input value={msg} onChange={e=>setMsg(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()} placeholder="Koçlara yaz..." style={{border:"none",background:"none",outline:"none",fontSize:13,color:C.ink,width:"100%",...F}}/></div><button onClick={send} style={{width:44,height:44,borderRadius:16,background:C.emerald,border:"none",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",boxShadow:`0 4px 12px rgba(26,102,69,.35)`}}><Ico d={IC.send} size={18} color={C.white}/></button></div></div>
   </div>;
 };
@@ -1178,7 +1182,8 @@ const CoachCal=({user,allUsers})=>{
   const [sel,setSel]=useState(todayIso);
   const [adding,setAdding]=useState(false);
   const [,forceUpdate]=useState(0);
-  const clients=allUsers.filter(u=>u.role==="client"&&u.coachId===user.id);
+  const users=workspaceUsers(allUsers);
+  const clients=users.filter(u=>u.role==="client"&&u.coachId===user.id);
   const [form,setForm]=useState({clientId:clients[0]?.id||"",type:"İlerleme görüşmesi",date:todayIso,time:"10:00",duration:"30 dk",status:"confirmed"});
   const days=dates.map(d=>d.label);
   const sessions=sessionsForCoach(DB.sess(),user.id);
@@ -1227,7 +1232,7 @@ const CoachCal=({user,allUsers})=>{
       </div>
       <div style={{flex:1,overflowY:"auto",padding:"16px"}}>
         {daySess.length===0?<div style={{textAlign:"center",padding:"48px 24px"}}><div style={{width:60,height:60,borderRadius:20,background:C.mint,margin:"0 auto 16px",display:"flex",alignItems:"center",justifyContent:"center"}}><Ico d={IC.cal} size={26} color={C.stone}/></div><div style={{fontSize:14,fontWeight:700,color:C.ink,...F}}>Seans yok</div></div>
-        :daySess.map((s,i)=>{const client=allUsers.find(u=>u.id===s.clientId);return(
+        :daySess.map((s,i)=>{const client=users.find(u=>u.id===s.clientId);return(
           <Card key={i} style={{padding:"14px 16px",marginBottom:10,display:"flex",gap:12,alignItems:"center",flexWrap:"wrap"}}>
             <div style={{textAlign:"center",minWidth:44}}><div style={{fontSize:15,fontWeight:800,color:C.ink,...F}}>{s.time}</div><div style={{fontSize:10,color:C.stone,...F}}>{s.duration}</div></div>
             <div style={{width:1.5,height:40,background:C.mint,borderRadius:1}}/>
@@ -1249,7 +1254,8 @@ const CoachReports=({user,allUsers})=>{
   const [period,setPeriod]=useState("7G");const anim=useAnim(period);
   const [,forceProofUpdate]=useState(0);
   const [weightDraft,setWeightDraft]=useState({});
-  const clients=coachReportClients(Array.isArray(allUsers)&&allUsers.length?allUsers:DB.users(),user.id);
+  const users=workspaceUsers(allUsers);
+  const clients=coachReportClients(users,user.id);
   const avg=averageCompliance(clients);
   const risky=riskClients(clients,isRiskClient);
   const logs=recentTaskLogsForClients(DB.taskLogs(),clients);
@@ -1574,7 +1580,8 @@ const ClientTasks=({user,onUpdate})=>{
 
 const ClientMsgs=({user,allUsers})=>{
   const [msg,setMsg]=useState("");const [mediaOpen,setMediaOpen]=useState(false);const [,forceUpdate]=useState(0);
-  const coach=DB.users().find(u=>u.id===user.coachId)||allUsers.find(u=>u.id===user.coachId);const ref=useRef();const photoRef=useRef(null);const recRef=useRef(null);const chunksRef=useRef([]);const [recording,setRecording]=useState(false);const [voiceDraft,setVoiceDraft]=useState(null);const [recordSeconds,setRecordSeconds]=useState(0);
+  const users=workspaceUsers(allUsers);
+  const coach=DB.users().find(u=>u.id===user.coachId)||users.find(u=>u.id===user.coachId);const ref=useRef();const photoRef=useRef(null);const recRef=useRef(null);const chunksRef=useRef([]);const [recording,setRecording]=useState(false);const [voiceDraft,setVoiceDraft]=useState(null);const [recordSeconds,setRecordSeconds]=useState(0);
   const coachEnabled=coach?.clientMessagesOpen!==false;const canSend=coachEnabled;
   const msgs=()=>conversationBetween(DB.msgs(),user.id,user.coachId);
   const pushMsg=async(extra)=>{if(!canSend)return;const record=await createMessageRecord({user,to:user.coachId,extra,logLabel:"cloud-client-message"});DB.setMsgs([...DB.msgs(),record]);forceUpdate(n=>n+1);};
@@ -1808,7 +1815,8 @@ const ClientCal=({user,allUsers})=>{
   const [req,setReq]=useState({date:todayIso,time:"10:00",type:"Görüşme talebi",duration:"30 dk"});
   const [,forceUpdate]=useState(0);
   const days=dates.map(d=>d.label);
-  const coach=allUsers.find(u=>u.id===user.coachId);
+  const users=workspaceUsers(allUsers);
+  const coach=users.find(u=>u.id===user.coachId);
   const sessions=sessionsForClient(DB.sess(),user.id);
   const daySess=sessionsForDate(sessions,sel);
   const updateSession=async(id,patch)=>{const applied=applySessionPatch(DB.sess(),id,patch);let updated=applied.updated;if(isProductionMode()&&user.supabaseToken){try{updated={...updated,...(await updateCloudAppointment(id,patch,user.supabaseToken)||{})};}catch(err){console.warn("cloud-client-session-update",err);}}DB.setSess(DB.sess().map(s=>s.id===id?updated:s));if(updated.coachId&&patch.status==="confirmed")addNotice(updated.coachId,clientSessionConfirmedNotice(user.name,updated),"session");forceUpdate(n=>n+1);};
@@ -1925,7 +1933,8 @@ const ProfileScreen=({user,allUsers,onUpdate,onLogout})=>{
   const [customProgram,setCustomProgram]=useState({name:"",desc:"",duration:"30 gün",tasks:"",productVideo:null});
   const [videoProgram,setVideoProgram]=useState(null);
   const photoRef=useRef(null);const programVideoRef=useRef(null);const rowVideoRef=useRef(null);
-  const clients=isCoach?allUsers.filter(u=>u.role==="client"&&u.coachId===user.id):[];
+  const users=workspaceUsers(allUsers);
+  const clients=isCoach?users.filter(u=>u.role==="client"&&u.coachId===user.id):[];
   const banned=clients.filter(c=>c.status==="banned");
   const activePrograms=clients.filter(hasAssignedProgram);
   const productVideos=isCoach?clients.flatMap(c=>(Array.isArray(c.productVideos)?c.productVideos:[c.productVideoDraft].filter(Boolean)).filter(v=>v?.mediaId||v?.url).map(v=>({client:c,video:v}))):[];

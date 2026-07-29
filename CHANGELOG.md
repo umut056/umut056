@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Rapor, profil, takvim ve mesaj ekranlarinda eksik allUsers verisi beyaz ekran olusturmasin diye ortak workspace guard eklendi.
+
 - Danisan ozetinden kaldirilan koc notu akisi App shell temizliginden gecirildi; legacy servis uyumlulugu korundu.
 
 - Gunluk gorev listesi tek queue modeline baglandi; tamamlanan gorevler listeden duser ve koc uyumu bugunku state ile hesaplanir.
