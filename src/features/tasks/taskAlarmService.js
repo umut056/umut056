@@ -13,6 +13,9 @@ export function buildTaskAlarms(tasks = [], checks = [], snoozed = {}) {
       title: task.l || task.title || `Görev ${index + 1}`,
       time: taskAlarmTime(task, snoozed, index),
       done: !!checks[index],
+      repeatDelayMs: 60 * 1000,
+      graceMinutes: 5,
+      requiresAcknowledgement: true,
     }))
     .filter((task) => task.time && !task.done);
 }

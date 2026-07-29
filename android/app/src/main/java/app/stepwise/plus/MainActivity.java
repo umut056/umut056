@@ -114,6 +114,7 @@ public class MainActivity extends BridgeActivity {
                     JSONObject item = alarms.getJSONObject(i);
                     int id = item.optInt("id", i);
                     String time = item.optString("time", "09:00");
+                    long repeatDelayMs = item.optLong("repeatDelayMs", 60 * 1000);
                     String[] parts = time.split(":");
                     Calendar calendar = Calendar.getInstance();
                     calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(parts[0]));
@@ -128,6 +129,7 @@ public class MainActivity extends BridgeActivity {
                     intent.putExtra("title", item.optString("title", "StepWise Plus görevi"));
                     intent.putExtra("time", time);
                     intent.putExtra("alarmId", id);
+                    intent.putExtra("repeatDelayMs", repeatDelayMs);
                     PendingIntent pending = PendingIntent.getBroadcast(
                         context,
                         42000 + id,
@@ -165,6 +167,7 @@ public class MainActivity extends BridgeActivity {
         }
 
         static void cancelSingleTaskAlarm(Context context, int id) {
+            removeSavedTaskAlarm(context, id);
             AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             Intent intent = new Intent(context, StepWiseAlarmReceiver.class);
             PendingIntent pending = PendingIntent.getBroadcast(
@@ -186,7 +189,7 @@ public class MainActivity extends BridgeActivity {
         static void cancelAllTaskAlarms(Context context) {
             AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            for (int i = 0; i < 120; i++) {
+            for (int i = 0; i < 240; i++) {
                 Intent intent = new Intent(context, StepWiseAlarmReceiver.class);
                 PendingIntent pending = PendingIntent.getBroadcast(
                     context,
@@ -202,6 +205,21 @@ public class MainActivity extends BridgeActivity {
                     notificationManager.cancel(44000 + i);
                 }
             }
+        }
+
+        static void removeSavedTaskAlarm(Context context, int id) {
+            try {
+                SharedPreferences prefs = context.getSharedPreferences("stepwise_alarms", Context.MODE_PRIVATE);
+                JSONArray alarms = new JSONArray(prefs.getString("task_alarms", "[]"));
+                JSONArray next = new JSONArray();
+                for (int i = 0; i < alarms.length(); i++) {
+                    JSONObject item = alarms.getJSONObject(i);
+                    if (item.optInt("id", -1) != id) {
+                        next.put(item);
+                    }
+                }
+                prefs.edit().putString("task_alarms", next.toString()).apply();
+            } catch (Exception ignored) {}
         }
 
         static void restoreSavedTaskAlarms(Context context) {

@@ -19,8 +19,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class StepWiseAlarmReceiver extends BroadcastReceiver {
-    private static final String CHANNEL_ID = "stepwise_task_alarm_v7";
-    private static final long REPEAT_DELAY_MS = 60 * 1000;
+    private static final String CHANNEL_ID = "stepwise_task_alarm_v8";
+    private static final long DEFAULT_REPEAT_DELAY_MS = 60 * 1000;
     private static final long[] ALARM_VIBRATION_PATTERN = new long[]{0, 1200, 250, 1200, 250, 1600, 350, 1600, 500};
 
     @Override
@@ -28,6 +28,11 @@ public class StepWiseAlarmReceiver extends BroadcastReceiver {
         String title = intent.getStringExtra("title");
         String time = intent.getStringExtra("time");
         int alarmId = intent.getIntExtra("alarmId", 0);
+        long repeatDelayMs = intent.getLongExtra("repeatDelayMs", DEFAULT_REPEAT_DELAY_MS);
+        if (!isSessionActiveForAlarms(context)) {
+            MainActivity.StepWiseNative.cancelSingleTaskAlarm(context, alarmId);
+            return;
+        }
         if (!isAlarmStillActive(context, alarmId)) return;
         if (title == null || title.trim().isEmpty()) title = "StepWise Plus g\u00f6revi";
         if (time == null) time = "";
@@ -98,20 +103,22 @@ public class StepWiseAlarmReceiver extends BroadcastReceiver {
                 vibrator.vibrate(ALARM_VIBRATION_PATTERN, -1);
             }
         }
-        scheduleRepeatIfStillActive(context, alarmId, title, time);
+        scheduleRepeatIfStillActive(context, alarmId, title, time, repeatDelayMs);
     }
 
-    private void scheduleRepeatIfStillActive(Context context, int alarmId, String title, String time) {
+    private void scheduleRepeatIfStillActive(Context context, int alarmId, String title, String time, long repeatDelayMs) {
         try {
+            if (!isSessionActiveForAlarms(context)) return;
             if (!isAlarmStillActive(context, alarmId)) return;
             AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             if (manager == null) return;
-            long triggerAt = System.currentTimeMillis() + REPEAT_DELAY_MS;
+            long triggerAt = System.currentTimeMillis() + Math.max(30 * 1000, repeatDelayMs);
 
             Intent repeatIntent = new Intent(context, StepWiseAlarmReceiver.class);
             repeatIntent.putExtra("title", title);
             repeatIntent.putExtra("time", time);
             repeatIntent.putExtra("alarmId", alarmId);
+            repeatIntent.putExtra("repeatDelayMs", repeatDelayMs);
             PendingIntent pending = PendingIntent.getBroadcast(
                 context,
                 42000 + alarmId,
@@ -147,5 +154,10 @@ public class StepWiseAlarmReceiver extends BroadcastReceiver {
             }
         } catch (Exception ignored) {}
         return false;
+    }
+
+    private boolean isSessionActiveForAlarms(Context context) {
+        return context.getSharedPreferences("stepwise_session", Context.MODE_PRIVATE)
+            .getBoolean("active", true);
     }
 }

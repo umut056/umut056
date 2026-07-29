@@ -29,6 +29,9 @@ describe("taskAlarmService", () => {
         title: "Sabah tartisi",
         time: "07:30",
         done: false,
+        repeatDelayMs: 60 * 1000,
+        graceMinutes: 5,
+        requiresAcknowledgement: true,
       },
     ]);
   });

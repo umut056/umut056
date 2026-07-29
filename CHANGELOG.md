@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Alarm planlama aktif oturum kontrolu, stale alarm temizligi ve offline tekrar metadata akisi ile guclendirildi.
+
 - Hazir test hesaplari login kartlari ve seed kullanicilariyla tek kaynaga baglandi.
 
 - Wellness V2 dashboard temeli health score, AI onizleme, su/beslenme/aktivite ve olcum servisleriyle baglandi.
