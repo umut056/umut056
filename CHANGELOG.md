@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Rapor ve ilerleme ekranlari icin eksik/bozuk vucut olcumu degerleri normalize edildi.
+
 - Mesaj bildirimleri icin gonderen ve toplam okunmamis mesaj ozeti servis seviyesinde eklendi.
 
 - Android gorev alarmlari israrci bildirimle guclendirildi ve WebView fallback alarm tonu uzatildi.

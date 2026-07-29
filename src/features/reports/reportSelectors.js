@@ -1,4 +1,5 @@
 import { weightDelta } from "../../shared/lib/format.js";
+import { normalizeBody } from "../measurements/measurementService.js";
 
 const asArray = (value) => (Array.isArray(value) ? value : []);
 
@@ -39,23 +40,7 @@ export function clientProgressBars({ compliance = 0, weekly = 0 } = {}) {
 }
 
 export function clientProgressBody(body = {}) {
-  return {
-    height: 0,
-    age: 0,
-    gender: "female",
-    start: 0,
-    current: 0,
-    target: 0,
-    water: 0,
-    fat: 0,
-    muscle: 0,
-    bmi: 0,
-    waist: 0,
-    hip: 0,
-    chest: 0,
-    ideal: "-",
-    ...body,
-  };
+  return normalizeBody(body);
 }
 
 export function topClientProgressClients(users = [], limit = 6) {

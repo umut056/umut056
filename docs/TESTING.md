@@ -60,6 +60,7 @@ npm run doctor:production
 - Kilo/olcum servisleri: gecersiz kilo korumasi, ilk kilo kaydi, kg format fallback ve vucut olcum normalize akisi
 - Koc dashboard ozet hesaplama
 - Koc rapor selectorlari: eksik veri ve kapsamli danisan filtreleme regression testi
+- Rapor/ilerleme body guard: eksik ve bozuk vucut olcumu degerlerini normalize etme
 - Profil patch: offline/local kayit, cloud merge, cloud hata fallback ve eksik id korumasi
 - Auth registration: rol, ref kodu, aktivasyon kodu ve lokal danisan varsayilanlari
 - Danisan dashboard ilerleme hesaplama

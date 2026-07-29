@@ -3,6 +3,7 @@ import {
   averageCompliance,
   clientsByCompliance,
   clientsByMonthlyScore,
+  clientProgressBody,
   coachReportClients,
   recentTaskLogsForClients,
   riskClients,
@@ -18,6 +19,24 @@ describe("reportSelectors", () => {
     expect(recentTaskLogsForClients(null, null)).toEqual([]);
     expect(clientsByCompliance(null)).toEqual([]);
     expect(clientsByMonthlyScore(null)).toEqual([]);
+  });
+
+  it("normalizes client progress body values for empty progress screens", () => {
+    const body = clientProgressBody({
+      start: "72",
+      current: undefined,
+      target: "bad",
+      waist: "84.5",
+      gender: "",
+      ideal: "",
+    });
+
+    expect(body.start).toBe(72);
+    expect(body.current).toBe(0);
+    expect(body.target).toBe(0);
+    expect(body.waist).toBe(84.5);
+    expect(body.gender).toBe("female");
+    expect(body.ideal).toBe("-");
   });
 
   it("summarizes coach report clients from mixed workspace users", () => {
