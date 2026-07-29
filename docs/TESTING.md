@@ -57,6 +57,7 @@ npm run doctor:production
 - Cloud mesaj map: gonderen adi metadata koruma
 - Okunmamis mesajlar: gonderen bazli adet, son mesaj ve onizleme ozeti
 - Mesaj badge ozeti: tek/multiple gonderen icin okunabilir toplam ve son gonderen metadatasi
+- Mesaj navigasyon rozeti: okunmamis ozet metadata'sinin alt navigasyona tasinmasi
 - Medya kaliciligi: lokal kayit, cloud upload, offline fallback ve signed URL yenileme
 - Kilo/olcum servisleri: gecersiz kilo korumasi, ilk kilo kaydi, kg format fallback ve vucut olcum normalize akisi
 - Koc dashboard ozet hesaplama

@@ -75,8 +75,8 @@ import {
   createLocalNotice,
   markMessagesRead as markMessagesReadState,
   showBrowserNotification,
-  unreadCount as selectUnreadCount,
   unreadCountFrom as selectUnreadCountFrom,
+  unreadMessageBadge as selectUnreadMessageBadge,
   unreadMessagesFor as selectUnreadMessagesFor,
 } from "./features/notifications/notificationService.js";
 import { mergeCloudUsersWithLocal, mergeMessages, normalizeUserDefaults, normalizeUsers } from "./features/sync/workspaceService.js";
@@ -299,8 +299,8 @@ const recordAudit=async({actor,action,targetTable,targetId,metadata={}})=>{
   return entry;
 };
 const unreadMessagesFor=(userId,fromId=null)=>selectUnreadMessagesFor(DB.msgs(),userId,fromId);
-const unreadCount=(user)=>selectUnreadCount(DB.msgs(),user);
 const unreadCountFrom=(userId,fromId)=>selectUnreadCountFrom(DB.msgs(),userId,fromId);
+const unreadMessageBadge=(user,participants=[])=>selectUnreadMessageBadge(DB.msgs(),user?.id,participants);
 const markMessagesRead=(userId,fromId=null)=>{
   const {messages:next,changed}=markMessagesReadState(DB.msgs(),userId,fromId);
   if(changed)DB.setMsgs(next);
@@ -618,10 +618,10 @@ const HomeBar=()=>(
 const BotNav=({tabs,active,onNav})=>(
   <div style={{display:"flex",background:"rgba(255,255,255,.9)",borderTop:"1px solid rgba(209,241,220,.9)",padding:"8px 0 max(8px, env(safe-area-inset-bottom))",boxShadow:"0 -18px 42px rgba(18,112,61,.14)",backdropFilter:"blur(20px)",flexShrink:0}}>
     {tabs.map(t=>{const on=active===t.id;return(
-      <button key={t.id} onClick={()=>onNav(t.id)} style={{flex:1,border:"none",background:"none",display:"flex",flexDirection:"column",alignItems:"center",gap:3,padding:"4px 0",cursor:"pointer",position:"relative"}}>
+      <button key={t.id} onClick={()=>onNav(t.id)} title={t.badgeTitle||t.label} aria-label={t.badgeTitle||t.label} style={{flex:1,border:"none",background:"none",display:"flex",flexDirection:"column",alignItems:"center",gap:3,padding:"4px 0",cursor:"pointer",position:"relative"}}>
         <div style={{width:42,height:30,borderRadius:15,background:on?"linear-gradient(135deg,#e9faef,#d7f6dd)":"transparent",display:"flex",alignItems:"center",justifyContent:"center",transition:"background .2s",boxShadow:on?"0 8px 18px rgba(21,148,68,.16)":"none",border:on?"1px solid rgba(31,166,75,.18)":"1px solid transparent"}}>
           <Ico d={t.icon} size={18} color={on?"#009f3d":C.stone} stroke={on?2.4:1.7}/>
-          {t.badge>0&&!on&&<div style={{position:"absolute",top:-3,right:"50%",marginRight:-23,minWidth:16,height:16,padding:"0 4px",boxSizing:"border-box",borderRadius:999,background:C.risk,color:C.white,border:`2px solid ${C.white}`,fontSize:9,fontWeight:900,lineHeight:"12px",display:"flex",alignItems:"center",justifyContent:"center",...F}}>{t.badge>99?"99+":t.badge}</div>}
+          {t.badge>0&&!on&&<div style={{position:"absolute",top:-3,right:"50%",marginRight:-23,minWidth:16,height:16,padding:"0 4px",boxSizing:"border-box",borderRadius:999,background:C.risk,color:C.white,border:`2px solid ${C.white}`,fontSize:9,fontWeight:900,lineHeight:"12px",display:"flex",alignItems:"center",justifyContent:"center",...F}}>{t.badgeLabel||((t.badge>99)?"99+":t.badge)}</div>}
         </div>
         <span style={{fontSize:9.5,fontWeight:on?900:600,color:on?"#0c8f3e":C.stone,...F}}>{t.label}</span>
       </button>
@@ -2229,11 +2229,13 @@ export default function App() {
   // Admin → mobile gets a native-shaped panel, wide screens keep the full web console.
   if(user?.role==="admin") return <>{showSplash&&<StepWiseSplash/>}{isMobileAdmin?<AdminMobilePanel admin={user} onLogout={logout}/>:<AdminPanel admin={user} onLogout={logout}/>}</>;
 
+  const messageBadge=unreadMessageBadge(user,allUsers);
+
   const coachTabs=[
     {id:"home",icon:IC.home,label:"Özet"},
     {id:"clients",icon:IC.clients,label:"Danışanlar"},
     {id:"calendar",icon:IC.cal,label:"Takvim"},
-    {id:"messages",icon:IC.msg,label:"Mesajlar",badge:unreadCount(user)},
+    {id:"messages",icon:IC.msg,label:"Mesajlar",badge:messageBadge.total,badgeTitle:messageBadge.label||"Mesajlar"},
     // Koçlar arası sohbet taslak olarak kodda duruyor; güncelleme ile açılacak.
     {id:"reports",icon:IC.chart,label:"Rapor"},
     {id:"profile",icon:IC.settings,label:"Profil"},
@@ -2243,7 +2245,7 @@ export default function App() {
     {id:"tasks",icon:IC.target,label:"Görevler",badge:currentPendingCount(user)},
     {id:"calendar",icon:IC.cal,label:"Takvim"},
     {id:"progress",icon:IC.chart,label:"İlerleme"},
-    {id:"messages",icon:IC.msg,label:"Koçum",badge:unreadCount(user)},
+    {id:"messages",icon:IC.msg,label:"Koçum",badge:messageBadge.total,badgeTitle:messageBadge.label||"Koçum"},
     {id:"profile",icon:IC.settings,label:"Profil"},
   ];
 
