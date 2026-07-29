@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Koc mesaj ekranina okunmamis gonderen ozeti ve okunmamis danisanlari uste tasiyan inbox davranisi eklendi.
+
 - Alarm planlama aktif oturum kontrolu, stale alarm temizligi ve offline tekrar metadata akisi ile guclendirildi.
 
 - Hazir test hesaplari login kartlari ve seed kullanicilariyla tek kaynaga baglandi.

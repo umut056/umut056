@@ -81,7 +81,7 @@ import {
   createLocalNotice,
   markMessagesRead as markMessagesReadState,
   showBrowserNotification,
-  unreadCountFrom as selectUnreadCountFrom,
+  unreadConversationSummaries as selectUnreadConversationSummaries,
   unreadMessageBadge as selectUnreadMessageBadge,
   unreadMessagesFor as selectUnreadMessagesFor,
 } from "./features/notifications/notificationService.js";
@@ -315,7 +315,6 @@ const recordAudit=async({actor,action,targetTable,targetId,metadata={}})=>{
   return entry;
 };
 const unreadMessagesFor=(userId,fromId=null)=>selectUnreadMessagesFor(DB.msgs(),userId,fromId);
-const unreadCountFrom=(userId,fromId)=>selectUnreadCountFrom(DB.msgs(),userId,fromId);
 const unreadMessageBadge=(user,participants=[])=>selectUnreadMessageBadge(DB.msgs(),user?.id,participants);
 const markMessagesRead=(userId,fromId=null)=>{
   const {messages:next,changed}=markMessagesReadState(DB.msgs(),userId,fromId);
@@ -1091,8 +1090,12 @@ const CoachMsgs=({user,allUsers})=>{
   const clients=allUsers.filter(u=>u.role==="client"&&u.coachId===user.id);
   const ref=useRef();const photoRef=useRef(null);const recRef=useRef(null);const chunksRef=useRef([]);const [recording,setRecording]=useState(false);const [voiceDraft,setVoiceDraft]=useState(null);const [recordSeconds,setRecordSeconds]=useState(0);
   const canSend=enabled;
+  const unreadSummaries=selectUnreadConversationSummaries(DB.msgs(),user.id,clients,messagePreviewText);
+  const unreadByClient=new Map(unreadSummaries.map(summary=>[summary.senderId,summary]));
+  const unreadTotal=unreadSummaries.reduce((total,summary)=>total+summary.count,0);
   const toggleMessaging=()=>{const nextEnabled=!enabled;setEnabled(nextEnabled);const next={...user,clientMessagesOpen:nextEnabled};DB.setUsers(DB.users().map(u=>u.id===user.id?next:u));saveSession(next);forceUpdate(n=>n+1);};
   const conv=(cid)=>conversationBetween(DB.msgs(),user.id,cid);
+  const clientRows=clients.map(c=>{const msgs=conv(c.id);const last=msgs[msgs.length-1];const unread=unreadByClient.get(c.id)?.count||0;return{client:c,msgs,last,unread,lastAt:last?.createdAt||0};}).sort((a,b)=>(b.unread>0)-(a.unread>0)||b.unread-a.unread||b.lastAt-a.lastAt||String(a.client.name).localeCompare(String(b.client.name),"tr"));
   const pushMsg=async(extra)=>{if(!sel||!canSend)return;const record=await createMessageRecord({user,to:sel.id,extra,logLabel:"cloud-message"});DB.setMsgs([...DB.msgs(),record]);forceUpdate(n=>n+1);};
   const send=()=>{if(!msg.trim()||!sel||!canSend)return;pushMsg({text:msg.trim(),kind:"text"});setMsg("");};
   const sendFile=async(e,kind)=>{const file=e.target.files?.[0];if(!file||!sel||!canSend)return;try{pushMsg(await createMediaMessageDraft({kind,file,user,clientId:sel.id,idPrefix:"msg"}));}catch{alert("Medya kaydedilemedi. Lütfen tekrar dene.");}e.target.value="";};
@@ -1147,9 +1150,10 @@ const CoachMsgs=({user,allUsers})=>{
         <div style={{fontSize:11,color:C.stone,marginTop:6,...F}}>{enabled?"Danışan sohbeti herkese açık.":"Danışan sohbeti herkese kapalı."}</div>
       </div>
       <div style={{flex:1,overflowY:"auto"}}>
+        {unreadTotal>0&&<div style={{padding:"12px 20px 4px"}}><Card onClick={()=>{const top=clients.find(c=>c.id===unreadSummaries[0]?.senderId);if(top)setSel(top);}} style={{padding:"14px",border:`1px solid ${C.mint}`,background:"linear-gradient(135deg,#f0fff8,#ffffff)",cursor:"pointer",boxShadow:"0 12px 28px rgba(13,61,43,.08)"}}><div style={{display:"flex",alignItems:"center",gap:12}}><div style={{width:42,height:42,borderRadius:15,background:C.emerald,display:"flex",alignItems:"center",justifyContent:"center",color:C.white,fontWeight:900,...F}}>{unreadTotal}</div><div style={{flex:1,minWidth:0}}><div style={{fontSize:13,fontWeight:900,color:C.ink,...F}}>{unreadSummaries[0]?.senderName} mesaj gönderdi</div><div style={{fontSize:12,color:C.stone,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",...F}}>{unreadSummaries.length>1?`${unreadSummaries.length} danışandan ${unreadTotal} okunmamış mesaj`:unreadSummaries[0]?.lastText}</div></div><Ico d={IC.chev} size={18} color={C.emerald}/></div></Card></div>}
         {clients.length===0?<div style={{padding:"40px 20px",textAlign:"center",color:C.stone,fontSize:13,...F}}>Henüz danışan yok</div>
-        :clients.map((c,i)=>{const msgs=conv(c.id);const last=msgs[msgs.length-1];const unread=unreadCountFrom(user.id,c.id);const lastFromClient=last?.from===c.id;const lastText=messagePreviewText(last);return(
-          <div key={i} onClick={()=>setSel(c)} style={{display:"flex",gap:12,padding:"14px 20px",borderBottom:`1px solid ${C.foam}`,background:unread?C.foam:C.white,cursor:"pointer",alignItems:"center"}}>
+        :clientRows.map(({client:c,last,unread},i)=>{const lastFromClient=last?.from===c.id;const lastText=messagePreviewText(last);return(
+          <div key={c.id||i} onClick={()=>setSel(c)} style={{display:"flex",gap:12,padding:"14px 20px",borderBottom:`1px solid ${C.foam}`,background:unread?"#f2fff8":C.white,cursor:"pointer",alignItems:"center"}}>
             <Av ini={ini(c.name)} size={46}/>
             <div style={{flex:1,minWidth:0}}><div style={{display:"flex",alignItems:"center",gap:8}}><div style={{fontSize:14,fontWeight:unread?900:700,color:C.ink,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",...F}}>{c.name}</div>{unread>0&&<span style={{background:C.risk,color:C.white,borderRadius:999,minWidth:22,height:22,padding:"0 7px",boxSizing:"border-box",display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:900,...F}}>{unread}</span>}</div><div style={{fontSize:12,color:unread?C.emerald:C.stone,fontWeight:unread?800:500,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",...F}}>{last?`${lastFromClient?c.name:"Sen"}: ${lastText||"Mesaj"}`:"Henüz mesaj yok"}</div></div>
             {last&&<div style={{fontSize:11,color:unread?C.emerald:C.stone,fontWeight:unread?800:500,flexShrink:0,...F}}>{last.time}</div>}
