@@ -46,6 +46,7 @@ npm run doctor:production
 - Tamamlanan gunluk gorevlerin aktif listeden dusmesi ve gun tamamlama kurali
 - Gunluk compliance ve bekleyen gorev hesaplama
 - Gorev alarm kurallari: aktif gorev filtresi, erteleme onceligi, 5 dakika gecikme toleransi ve izin uyarilari
+- Android alarm sesi: israrci native bildirim ve daha uzun WebView fallback tonu
 - Koc fotograf onay kuyrugu: kapsam filtresi, danisan notu, onay/red/gizleme ve log olusturma
 - Koc-danisan mesaj filtresi
 - Grup/oda mesaj siralama

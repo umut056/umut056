@@ -2,24 +2,27 @@ import { buildTaskAlarms, msUntilTodayTime } from "../features/tasks/taskAlarmSe
 
 export const playAlarmTone = () => {
   try {
-    if (navigator.vibrate) navigator.vibrate([350, 120, 350, 120, 500]);
+    if (navigator.vibrate) navigator.vibrate([700, 180, 700, 180, 900, 320, 900]);
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     if (!AudioCtx) return;
     const ctx = new AudioCtx();
-    [880, 1175, 988].forEach((freq, index) =>
-      setTimeout(() => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = "square";
-        osc.frequency.value = freq;
-        gain.gain.value = 0.16;
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start();
-        setTimeout(() => osc.stop(), 260);
-      }, index * 310),
-    );
-    setTimeout(() => ctx.close(), 1300);
+    const sequence = [880, 1175, 988, 1175, 880];
+    for (let round = 0; round < 4; round++) {
+      sequence.forEach((freq, index) =>
+        setTimeout(() => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = "square";
+          osc.frequency.value = freq;
+          gain.gain.value = 0.18;
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          setTimeout(() => osc.stop(), 320);
+        }, round * 1800 + index * 330),
+      );
+    }
+    setTimeout(() => ctx.close(), 8200);
   } catch {}
 };
 

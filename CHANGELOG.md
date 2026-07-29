@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Android gorev alarmlari israrci bildirimle guclendirildi ve WebView fallback alarm tonu uzatildi.
+
 - Gunluk gorevlerde tamamlanan maddelerin aktif listeden dusmesi ve gun tamamlama kurali testle sabitlendi.
 
 - Kilo ve vucut olcum servisleri bos deger, degisim hesaplama ve format fallback testleriyle guvenceye alindi.

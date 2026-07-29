@@ -86,7 +86,9 @@ public class StepWiseAlarmReceiver extends BroadcastReceiver {
             .setContentIntent(openPending)
             .setFullScreenIntent(openPending, true);
 
-        manager.notify(44000 + alarmId, notification.build());
+        Notification alarmNotification = notification.build();
+        alarmNotification.flags |= Notification.FLAG_INSISTENT;
+        manager.notify(44000 + alarmId, alarmNotification);
 
         Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
         if (vibrator != null) {
