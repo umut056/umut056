@@ -29,7 +29,13 @@ import {
   weekDateItems,
 } from "./features/calendar/appointmentService.js";
 import { attachClientToCoach, buildNewClientProfile } from "./features/clients/clientService.js";
-import { dashboardWeightText, getClientDashboardSummary, getCoachDashboardSummary } from "./features/dashboard/dashboardSelectors.js";
+import {
+  dashboardWeightText,
+  getClientDashboardSummary,
+  getClientWellnessSnapshot,
+  getCoachDashboardSummary,
+  getCoachV2Snapshot,
+} from "./features/dashboard/dashboardSelectors.js";
 import { applyBodyEstimateToDraft, bodyDefaults, normalizeBody } from "./features/measurements/measurementService.js";
 import { conversationBetween, createMediaMessageDraft, createMessageRecord, messagePreviewText, roomMessages, syncConversationRead } from "./features/messages/messageService.js";
 import { MediaAudio, MediaImage, ProductVideo, hasMediaImage } from "./features/media/mediaComponents.jsx";
@@ -83,12 +89,22 @@ import { mergeCloudUsersWithLocal, mergeMessages, normalizeUserDefaults, normali
 import { isTaskOverdue, reminderPermissionWarnings } from "./features/tasks/taskAlarmService.js";
 import { dailyStateFor, mergeDailyUser } from "./features/tasks/dailyTaskService.js";
 import { buildWeightUpdate } from "./features/weight/weightService.js";
+import {
+  getWellnessDay,
+  updateActivityLog,
+  updateMeasurementLog,
+  updateNutritionLog,
+  updateWaterLog,
+  updateWeightLog,
+  wellnessHealthScore,
+  wellnessModuleStatus,
+} from "./features/wellness/wellnessService.js";
 import { daysBetween, ini, maskName, monthlyBadge, rankIcon, weightDelta } from "./shared/lib/format.js";
 import { estimateBody, measuresOf } from "./shared/lib/wellness.js";
 import { C, F } from "./shared/theme/tokens.js";
 import { Card, Ico, Pill, buttonStyle, controlStyle, inputShellStyle } from "./shared/ui/primitives.jsx";
 
-const APP_TEST_BUILD = "Test APK v1.0.16 · 22.07.2026";
+const APP_TEST_BUILD = "V2 Dashboard Test v1.0.17 · 22.07.2026";
 
 const isCloudId = (value = "") => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 
@@ -449,6 +465,17 @@ const Av=({ini,size=40,bg=C.mint,fg=C.emerald})=>(
 const Avatar=({user,size=40,bg=C.mint,fg=C.emerald})=>user?.avatarUrl||user?.avatarMediaId
   ? <MediaImage media={{url:user.avatarUrl,mediaId:user.avatarMediaId,storageBucket:user.avatarMedia?.storageBucket,storagePath:user.avatarMedia?.storagePath}} alt="" style={{width:size,height:size,borderRadius:"50%",objectFit:"cover",flexShrink:0,border:`3px solid ${bg}`,boxShadow:"0 10px 24px rgba(13,61,43,.18)"}}/>
   : <Av ini={ini(user?.name)} size={size} bg={bg} fg={fg}/>;
+const toneColors=(tone)=>tone==="risk"?{fg:C.risk,bg:"#fde8e6"}:tone==="warn"?{fg:C.warn,bg:"#fff4e0"}:tone==="neutral"?{fg:C.blue,bg:C.blueBg}:{fg:C.emerald,bg:C.mint};
+const V2InsightCard=({title,value,text,tone="good",icon=IC.activity,onClick})=>{
+  const tc=toneColors(tone);
+  return <Card onClick={onClick} style={{padding:"13px",borderRadius:18,background:"rgba(255,255,255,.9)",border:`1px solid ${tc.bg}`}}>
+    <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:9}}>
+      <div style={{width:34,height:34,borderRadius:14,background:tc.bg,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><Ico d={icon} size={17} color={tc.fg} stroke={2.4}/></div>
+      <div style={{flex:1,minWidth:0}}><div style={{fontSize:10,color:C.stone,fontWeight:900,letterSpacing:.3,...F}}>{title}</div><div style={{fontSize:18,fontWeight:950,color:tc.fg,lineHeight:1.05,...F}}>{value}</div></div>
+    </div>
+    <div style={{fontSize:11,color:C.ink,lineHeight:1.35,fontWeight:750,...F}}>{text}</div>
+  </Card>;
+};
 const COVER_THEMES=[`linear-gradient(135deg,${C.emerald},${C.forest})`,`linear-gradient(135deg,#2b7a78,#17252a)`,`linear-gradient(135deg,#3b7dd8,#102a43)`,`linear-gradient(135deg,#7c5cdb,#2c1a63)`,`linear-gradient(135deg,#d99a24,#7a3f12)`];
 const coverBg=(u)=>u?.coverBg||COVER_THEMES[0];
 const SWPMonogram=({size=96,width,height,animated=false,flat=false,variant})=>{
@@ -819,6 +846,7 @@ const CoachHome=({user,onNav,allUsers})=>{
     coachProofActions,
     isRiskClient,
   });
+  const coachV2=getCoachV2Snapshot({clients,avg,activeTasks,proofActions,riskClients});
   const handleProof=(p,status)=>{updateCoachProofStatus(user.id,p.client.id,p.idx,status);forceHomeUpdate(n=>n+1);};
   const openSummaryCard=(kind)=>{
     if(kind==="photo"&&proofActions[0]){setPreviewProof(proofActions[0]);return;}
@@ -835,24 +863,43 @@ const CoachHome=({user,onNav,allUsers})=>{
             <SWPMonogram width={64} height={38} flat variant="wide"/>
           </div>
           <div style={{flex:1}}>
-            <div style={{fontSize:12,color:"#667985",fontWeight:800,...F}}>Merhaba, Koç</div>
+            <div style={{fontSize:10,color:C.emerald,fontWeight:950,letterSpacing:.8,...F}}>STEPWISE PLUS V2</div>
             <div style={{fontSize:22,fontWeight:950,color:"#14252b",lineHeight:1.1,...F}}>{user.name}</div>
           </div>
           <Avatar user={user} size={64} bg="#e9faef" fg={C.emerald}/>
         </div>
         <div style={{background:"linear-gradient(135deg,rgba(8,55,40,.97),rgba(0,105,63,.9) 58%,rgba(114,212,29,.82))",borderRadius:24,padding:"20px 20px 18px",boxShadow:"0 22px 45px rgba(11,92,55,.24)",border:"1px solid rgba(255,255,255,.18)",position:"relative",overflow:"hidden"}}>
           <div style={{position:"absolute",right:-34,bottom:-42,width:150,height:150,borderRadius:"50%",border:"1px solid rgba(255,255,255,.16)"}}/>
-          <div style={{fontSize:11,color:"rgba(255,255,255,.75)",fontWeight:900,letterSpacing:.8,marginBottom:10,...F}}>BUGÜNÜN TAKİBİ</div>
+          <div style={{fontSize:11,color:"rgba(255,255,255,.75)",fontWeight:900,letterSpacing:.8,marginBottom:10,...F}}>COACH COMMAND CENTER</div>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginBottom:14}}>
-            <div><div style={{fontSize:42,fontWeight:950,color:C.white,lineHeight:1,...F}}>{Math.round(anim*avg)}%</div><div style={{fontSize:12,color:"rgba(255,255,255,.72)",fontWeight:700,...F}}>Ortalama uyum</div></div>
+            <div><div style={{fontSize:42,fontWeight:950,color:C.white,lineHeight:1,...F}}>{Math.round(anim*coachV2.healthScore)}</div><div style={{fontSize:12,color:"rgba(255,255,255,.72)",fontWeight:700,...F}}>Wellness skoru</div></div>
             <div style={{textAlign:"right"}}><div style={{fontSize:34,fontWeight:950,color:"#c7ff5c",lineHeight:1,...F}}>{activeTasks}</div><div style={{fontSize:12,color:"rgba(255,255,255,.72)",fontWeight:700,...F}}>Aktif görev</div></div>
           </div>
           <div style={{height:8,background:"rgba(255,255,255,.18)",borderRadius:999,overflow:"hidden"}}>
-            <div style={{width:`${anim*avg}%`,height:"100%",background:"linear-gradient(90deg,#ffffff,#c8ff55)",borderRadius:999,transition:"width .05s"}}/>
+            <div style={{width:`${anim*coachV2.healthScore}%`,height:"100%",background:"linear-gradient(90deg,#ffffff,#c8ff55)",borderRadius:999,transition:"width .05s"}}/>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginTop:14}}>
+            {coachV2.focusItems.map(item=>(
+              <div key={item.label} style={{background:"rgba(255,255,255,.13)",border:"1px solid rgba(255,255,255,.16)",borderRadius:14,padding:"8px 6px",textAlign:"center"}}>
+                <div style={{fontSize:16,fontWeight:950,color:C.white,lineHeight:1,...F}}>{item.value}</div>
+                <div style={{fontSize:9,color:"rgba(255,255,255,.68)",fontWeight:800,marginTop:3,...F}}>{item.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
       <div style={{padding:"16px"}}>
+        <Card style={{padding:"14px 16px",marginBottom:16,border:`1px solid rgba(26,102,69,.16)`,background:"rgba(255,255,255,.92)"}}>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <div style={{width:38,height:38,borderRadius:15,background:"linear-gradient(135deg,#e9faef,#d7f8cf)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+              <Ico d={IC.activity} size={18} color={C.emerald} stroke={2.6}/>
+            </div>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontSize:11,color:C.emerald,fontWeight:950,letterSpacing:.5,...F}}>AI TAKİP ÖZETİ</div>
+              <div style={{fontSize:13,color:C.ink,fontWeight:800,lineHeight:1.35,...F}}>{coachV2.aiBrief}</div>
+            </div>
+          </div>
+        </Card>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:16}}>
           {[{l:"Aktif Danışan",v:clients.length,c:"#009f3d",i:IC.clients,kind:"clients"},{l:"Fotoğraf",v:photoPending,c:"#e8a020",i:IC.cam,kind:"photo"},
             {l:"Riskli",v:riskClients.length,c:C.risk,i:IC.warn,kind:"risk"}].map((s,i)=>(
@@ -1303,8 +1350,9 @@ const ClientHome=({user,onNav,allUsers})=>{
     dailyState:homeDay,
     clientStartAt,
   });
+  const wellness=getClientWellnessSnapshot({client:user,taskPlan,dailyState:homeDay});
   return(
-    <div style={{flex:1,overflow:"hidden",background:C.mist,position:"relative"}}>
+    <div style={{flex:1,overflowY:"auto",overflowX:"hidden",background:C.mist,position:"relative"}}>
       <div style={{padding:"12px 18px 8px",position:"relative",overflow:"hidden"}}>
         <div style={{position:"absolute",left:-120,top:-130,width:300,height:300,borderRadius:"50%",background:"radial-gradient(circle,rgba(126,218,38,.2),rgba(255,255,255,0) 64%)",pointerEvents:"none"}}/>
         <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:10,position:"relative"}}>
@@ -1312,25 +1360,57 @@ const ClientHome=({user,onNav,allUsers})=>{
             <SWPMonogram width={58} height={34} flat variant="wide"/>
           </div>
           <div style={{flex:1}}>
-            <div style={{fontSize:12,color:"#667985",fontWeight:800,...F}}>Günaydın</div>
+            <div style={{fontSize:10,color:C.emerald,fontWeight:950,letterSpacing:.8,...F}}>STEPWISE PLUS V2</div>
             <div style={{fontSize:21,fontWeight:950,color:"#14252b",lineHeight:1.1,...F}}>{user.name.split(" ")[0]}</div>
           </div>
           <Avatar user={user} size={56} bg="#e9faef" fg={C.emerald}/>
         </div>
         <div style={{background:"linear-gradient(135deg,rgba(8,55,40,.97),rgba(0,105,63,.9) 58%,rgba(114,212,29,.82))",borderRadius:22,padding:"16px 18px 14px",boxShadow:"0 18px 34px rgba(11,92,55,.22)",border:"1px solid rgba(255,255,255,.18)",position:"relative",overflow:"hidden"}}>
           <div style={{position:"absolute",right:-34,bottom:-42,width:150,height:150,borderRadius:"50%",border:"1px solid rgba(255,255,255,.16)"}}/>
-          <div style={{fontSize:10,color:"rgba(255,255,255,.75)",fontWeight:900,letterSpacing:.8,marginBottom:8,...F}}>BUGÜNKÜ İLERLEMEN</div>
+          <div style={{fontSize:10,color:"rgba(255,255,255,.75)",fontWeight:900,letterSpacing:.8,marginBottom:8,...F}}>WELLNESS HEALTH SCORE</div>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginBottom:10}}>
-            <div><div style={{fontSize:34,fontWeight:950,color:C.white,lineHeight:1,...F}}>{Math.round(anim*pct)}<span style={{fontSize:17}}>%</span></div><div style={{fontSize:11,color:"rgba(255,255,255,.72)",fontWeight:700,...F}}>{done}/{taskPlan.length} görev</div></div>
+            <div><div style={{fontSize:34,fontWeight:950,color:C.white,lineHeight:1,...F}}>{Math.round(anim*wellness.healthScore)}</div><div style={{fontSize:11,color:"rgba(255,255,255,.72)",fontWeight:700,...F}}>Genel sağlık puanı</div></div>
             <div style={{textAlign:"right"}}><div style={{fontSize:10,color:"rgba(255,255,255,.72)",marginBottom:3,fontWeight:800,...F}}>Seri</div><div style={{fontSize:27,fontWeight:950,color:"#c7ff5c",lineHeight:1,...F}}>4</div><div style={{fontSize:10,color:"rgba(255,255,255,.72)",fontWeight:700,...F}}>gün</div></div>
           </div>
           <div style={{height:7,background:"rgba(255,255,255,.18)",borderRadius:999,overflow:"hidden"}}>
-            <div style={{width:`${anim*pct}%`,height:"100%",background:"linear-gradient(90deg,#ffffff,#c8ff55)",borderRadius:999,transition:"width .05s"}}/>
+            <div style={{width:`${anim*wellness.healthScore}%`,height:"100%",background:"linear-gradient(90deg,#ffffff,#c8ff55)",borderRadius:999,transition:"width .05s"}}/>
           </div>
-          <div style={{display:"flex",justifyContent:"space-between",gap:10,marginTop:10,fontSize:10,color:"rgba(255,255,255,.78)",fontWeight:700,...F}}><span>Başlangıç: {new Date(clientStartAt(user)).toLocaleDateString("tr")}</span><span>{elapsed} gün · {delta>0?`${delta} kg gitti`:delta<0?`${Math.abs(delta)} kg alındı`:"0 kg"}</span></div>
+          <div style={{display:"flex",justifyContent:"space-between",gap:10,marginTop:10,fontSize:10,color:"rgba(255,255,255,.78)",fontWeight:700,...F}}><span>{done}/{taskPlan.length} görev</span><span>{elapsed} gün · {delta>0?`${delta} kg gitti`:delta<0?`${Math.abs(delta)} kg alındı`:"0 kg"}</span></div>
         </div>
       </div>
       <div style={{padding:"10px 16px 0"}}>
+        <Card style={{padding:"12px 14px",marginBottom:10,border:`1px solid rgba(26,102,69,.16)`,background:"rgba(255,255,255,.92)",borderRadius:18}}>
+          <div style={{display:"flex",gap:10,alignItems:"flex-start"}}>
+            <div style={{width:34,height:34,borderRadius:14,background:"linear-gradient(135deg,#e9faef,#d7f8cf)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+              <Ico d={IC.activity} size={17} color={C.emerald} stroke={2.5}/>
+            </div>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontSize:10,color:C.emerald,fontWeight:950,letterSpacing:.5,...F}}>AI KOÇ ÖNİZLEME</div>
+              <div style={{fontSize:12,color:C.ink,fontWeight:800,lineHeight:1.35,...F}}>{wellness.aiInsight}</div>
+            </div>
+          </div>
+        </Card>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:7,marginBottom:10}}>
+          {wellness.modules.map((module)=>(
+            <Card key={module.id} style={{padding:"10px 6px",textAlign:"center",borderRadius:16,background:"rgba(255,255,255,.88)"}}>
+              <div style={{fontSize:18,fontWeight:950,color:module.score>=70?C.emerald:module.score>=45?C.warn:C.risk,lineHeight:1,...F}}>{module.score}</div>
+              <div style={{fontSize:9,color:C.stone,fontWeight:850,marginTop:4,...F}}>{module.label}</div>
+            </Card>
+          ))}
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
+          {wellness.actionCards.map(card=>(
+            <V2InsightCard
+              key={card.id}
+              title={card.label}
+              value={card.value}
+              text={card.text}
+              tone={card.tone}
+              icon={card.id==="nutrition"?IC.target:card.id==="body"?IC.chart:card.id==="hydration"?IC.activity:card.id==="products"?IC.award:IC.activity}
+              onClick={()=>["body","nutrition","hydration","activity"].includes(card.id)?onNav?.("progress"):card.id==="products"?onNav?.("tasks"):undefined}
+            />
+          ))}
+        </div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
           {[{l:"Başlangıç",v:dashboardWeightText(body.start),c:C.ink},{l:"Güncel",v:dashboardWeightText(body.current),c:C.emerald},{l:"Hedef",v:dashboardWeightText(body.target),c:C.blue},{l:"Değişim",v:delta>0?`-${delta} kg`:delta<0?`+${Math.abs(delta)} kg`:"0 kg",c:delta>=0?C.jade:C.warn}].map((m,i)=>(
             <Card key={i} style={{padding:"9px 12px",minHeight:52,display:"flex",flexDirection:"column",justifyContent:"center",borderRadius:18}}>
@@ -1345,6 +1425,7 @@ const ClientHome=({user,onNav,allUsers})=>{
           <div style={{fontSize:13,fontWeight:900,color:C.ink,lineHeight:1.3,...F}}>{isGain?`${elapsed} günde ${deltaLabel} kilo aldın.`:`${elapsed} günde ${deltaLabel} kilo gitti.`}</div>
           <div style={{fontSize:12,color:C.emerald,marginTop:4,lineHeight:1.25,...F}}>{isGain?"Sağlıklı artış çok iyi ilerliyor.":`${deltaLabel} kilo eridi bile. Harika gidiyorsun.`}</div>
         </Card>}
+        <div style={{height:18}}/>
       </div>
     </div>
   );
@@ -1557,26 +1638,143 @@ const ClientMsgs=({user,allUsers})=>{
   );
 };
 
-const ClientProgress=({user,allUsers})=>{
+const ClientProgress=({user,allUsers,onUpdate})=>{
   const anim=useAnim(user.id);
   const compliance=Number(user.compliance)||0;
   const weekly=Number(user.weeklyAverage)||0;
   const bars=clientProgressBars({compliance,weekly});
   const body=clientProgressBody(user.body);
   const clients=topClientProgressClients(allUsers);
+  const date=todayKey();
+  const wellnessDay=getWellnessDay(user,date);
+  const moduleStatus=wellnessModuleStatus(user,date);
+  const healthScore=wellnessHealthScore(user,date);
+  const [weightInput,setWeightInput]=useState(body.current>0?String(body.current):"");
+  const [measureInput,setMeasureInput]=useState({
+    waist:body.waist>0?String(body.waist):"",
+    hip:body.hip>0?String(body.hip):"",
+    chest:body.chest>0?String(body.chest):"",
+  });
+  const persistClient=(next)=>{
+    const users=DB.users().map((u)=>u.id===user.id?next:u);
+    DB.setUsers(users);
+    saveSession(next);
+    onUpdate?.(next);
+  };
+  const inputMini=(extra={})=>({
+    width:"100%",
+    boxSizing:"border-box",
+    border:`1.5px solid ${C.mint}`,
+    background:C.white,
+    borderRadius:12,
+    padding:"10px 11px",
+    fontSize:13,
+    color:C.ink,
+    outline:"none",
+    ...F,
+    ...extra,
+  });
+  const saveWeight=()=>persistClient(updateWeightLog(user,{weight:weightInput}));
+  const saveMeasurements=()=>persistClient(updateMeasurementLog(user,{date,measurements:measureInput}));
+  const changeMeasure=(key,value)=>setMeasureInput((m)=>({...m,[key]:value}));
+  const quickModule=(module)=>(
+    <Card key={module.id} style={{padding:"12px",borderRadius:18,background:"rgba(255,255,255,.92)",border:`1px solid ${module.score>=70?C.mint:C.foam}`}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8}}>
+        <div style={{minWidth:0}}>
+          <div style={{fontSize:11,color:C.stone,fontWeight:850,...F}}>{module.label}</div>
+          <div style={{fontSize:15,fontWeight:950,color:C.ink,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",...F}}>{module.value}</div>
+        </div>
+        <div style={{fontSize:17,fontWeight:950,color:module.score>=70?C.emerald:module.score>=40?C.warn:C.risk,...F}}>{module.score}</div>
+      </div>
+    </Card>
+  );
   return(
     <div style={{display:"flex",flexDirection:"column",height:"100%",background:C.mist}}>
       <div style={{background:"rgba(255,255,255,.74)",padding:"8px 20px 16px",backdropFilter:"blur(14px)",borderBottom:"1px solid rgba(255,255,255,.78)"}}>
         <div style={{fontSize:11,color:C.stone,fontWeight:600,letterSpacing:.5,...F}}>İLERLEME</div>
-        <div style={{fontSize:22,fontWeight:800,color:C.ink,...F}}>Performansım</div>
+        <div style={{fontSize:22,fontWeight:800,color:C.ink,...F}}>Wellness Merkezim</div>
       </div>
       <div style={{flex:1,overflowY:"auto",padding:"16px"}}>
         <Card style={{padding:"16px",marginBottom:16,background:`linear-gradient(135deg,${C.emerald},${C.forest})`}}>
-          <div style={{fontSize:11,color:"rgba(255,255,255,.65)",fontWeight:600,letterSpacing:.5,marginBottom:8,...F}}>GENEL UYUM</div>
-          <div style={{fontSize:44,fontWeight:800,color:C.white,...F}}>{Math.round(anim*compliance)}<span style={{fontSize:22}}>%</span></div>
-          <div style={{height:8,background:"rgba(255,255,255,.2)",borderRadius:4,overflow:"hidden",marginTop:12}}>
-            <div style={{width:`${anim*compliance}%`,height:"100%",background:C.gold,borderRadius:4,transition:"width .05s"}}/>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12}}>
+            <div>
+              <div style={{fontSize:11,color:"rgba(255,255,255,.65)",fontWeight:600,letterSpacing:.5,marginBottom:8,...F}}>HEALTH SCORE</div>
+              <div style={{fontSize:44,fontWeight:800,color:C.white,...F}}>{Math.round(anim*healthScore)}<span style={{fontSize:22}}>/100</span></div>
+            </div>
+            <Pill bg="rgba(255,255,255,.18)" color={C.white}>Uyum %{compliance}</Pill>
           </div>
+          <div style={{height:8,background:"rgba(255,255,255,.2)",borderRadius:4,overflow:"hidden",marginTop:12}}>
+            <div style={{width:`${anim*healthScore}%`,height:"100%",background:C.gold,borderRadius:4,transition:"width .05s"}}/>
+          </div>
+        </Card>
+        <Card style={{padding:"14px",marginBottom:16}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+            <div>
+              <div style={{fontSize:13,fontWeight:950,color:C.ink,...F}}>V2 Modüller</div>
+              <div style={{fontSize:11,color:C.stone,marginTop:2,...F}}>Bugünkü takip durumun</div>
+            </div>
+            <Pill bg={C.foam} color={C.emerald}>{date}</Pill>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}>
+            {moduleStatus.map(quickModule)}
+          </div>
+        </Card>
+        <Card style={{padding:"14px",marginBottom:16}}>
+          <div style={{fontSize:13,fontWeight:950,color:C.ink,marginBottom:12,...F}}>Kilo Takibi</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr auto",gap:8,alignItems:"center"}}>
+            <input type="number" inputMode="decimal" value={weightInput} onChange={(e)=>setWeightInput(e.target.value)} placeholder="Güncel kilo" style={inputMini()}/>
+            <button onClick={saveWeight} style={buttonStyle({style:{borderRadius:12,padding:"11px 13px"}})}>Kaydet</button>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginTop:10}}>
+            {[{l:"Başlangıç",v:dashboardWeightText(body.start)},{l:"Güncel",v:dashboardWeightText(body.current)},{l:"Hedef",v:dashboardWeightText(body.target)}].map((item)=>(
+              <div key={item.l} style={{background:C.foam,borderRadius:14,padding:"9px"}}>
+                <div style={{fontSize:10,color:C.stone,...F}}>{item.l}</div>
+                <div style={{fontSize:15,fontWeight:950,color:C.ink,...F}}>{item.v}</div>
+              </div>
+            ))}
+          </div>
+        </Card>
+        <Card style={{padding:"14px",marginBottom:16}}>
+          <div style={{fontSize:13,fontWeight:950,color:C.ink,marginBottom:12,...F}}>Ölçüm Takibi</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
+            <input type="number" inputMode="decimal" value={measureInput.waist} onChange={(e)=>changeMeasure("waist",e.target.value)} placeholder="Bel" style={inputMini()}/>
+            <input type="number" inputMode="decimal" value={measureInput.hip} onChange={(e)=>changeMeasure("hip",e.target.value)} placeholder="Kalça" style={inputMini()}/>
+            <input type="number" inputMode="decimal" value={measureInput.chest} onChange={(e)=>changeMeasure("chest",e.target.value)} placeholder="Göğüs" style={inputMini()}/>
+          </div>
+          <button onClick={saveMeasurements} style={buttonStyle({style:{width:"100%",borderRadius:13,padding:"11px",marginTop:10}})}>Ölçümleri Kaydet</button>
+        </Card>
+        <Card style={{padding:"14px",marginBottom:16}}>
+          <div style={{fontSize:13,fontWeight:950,color:C.ink,marginBottom:12,...F}}>Beslenme, Su ve Aktivite</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
+            {[
+              ["breakfast","Kahvaltı"],
+              ["lunch","Öğle"],
+              ["dinner","Akşam"],
+              ["snacks","Ara Öğün"],
+            ].map(([key,label])=>(
+              <button key={key} onClick={()=>persistClient(updateNutritionLog(user,{date,key}))} style={{border:`1.5px solid ${wellnessDay.nutrition[key]?C.emerald:C.mint}`,background:wellnessDay.nutrition[key]?C.mint:C.white,color:C.ink,borderRadius:14,padding:"10px",fontSize:12,fontWeight:900,...F}}>{label}</button>
+            ))}
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+            <div style={{background:C.foam,borderRadius:16,padding:"12px"}}>
+              <div style={{fontSize:11,color:C.stone,...F}}>Su</div>
+              <div style={{fontSize:20,fontWeight:950,color:C.emerald,...F}}>{wellnessDay.waterMl} ml</div>
+              <div style={{display:"flex",gap:6,marginTop:8}}>
+                {[250,500].map((ml)=><button key={ml} onClick={()=>persistClient(updateWaterLog(user,{date,deltaMl:ml}))} style={buttonStyle({variant:"soft",style:{flex:1,borderRadius:11,padding:"8px"}})}>+{ml}</button>)}
+              </div>
+            </div>
+            <div style={{background:C.foam,borderRadius:16,padding:"12px"}}>
+              <div style={{fontSize:11,color:C.stone,...F}}>Aktivite</div>
+              <div style={{fontSize:20,fontWeight:950,color:C.emerald,...F}}>{wellnessDay.activityMinutes} dk</div>
+              <div style={{display:"flex",gap:6,marginTop:8}}>
+                {[10,30].map((min)=><button key={min} onClick={()=>persistClient(updateActivityLog(user,{date,deltaMinutes:min}))} style={buttonStyle({variant:"soft",style:{flex:1,borderRadius:11,padding:"8px"}})}>+{min}</button>)}
+              </div>
+            </div>
+          </div>
+        </Card>
+        <Card style={{padding:"14px",marginBottom:16,border:`1.5px solid ${C.mint}`}}>
+          <div style={{fontSize:13,fontWeight:950,color:C.ink,marginBottom:6,...F}}>AI Koç Ön Hazırlık</div>
+          <div style={{fontSize:12,color:C.stone,lineHeight:1.45,...F}}>Bugünkü sağlık skorun %{healthScore}. Su, beslenme ve aktivite kayıtların arttıkça AI raporları daha kişisel hale gelecek.</div>
         </Card>
         <Card style={{padding:"16px",marginBottom:16}}>
           <div style={{fontSize:13,fontWeight:700,color:C.ink,marginBottom:14,...F}}>Son 7 günlük uyum</div>
@@ -1845,6 +2043,23 @@ const ProfileScreen=({user,allUsers,onUpdate,onLogout})=>{
       <div style={{flex:1,overflowY:"auto",padding:"16px"}}>
         {programAdding&&<div style={{position:"absolute",inset:0,background:"rgba(10,31,22,.72)",zIndex:80,display:"flex",alignItems:"flex-end"}}><div style={{background:C.white,borderRadius:"24px 24px 0 0",padding:"20px",width:"100%",maxHeight:"86%",overflowY:"auto",boxSizing:"border-box"}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}><div><div style={{fontSize:18,fontWeight:800,color:C.ink,...F}}>{programEditing?"Program Düzenle":"Program Ekle"}</div><div style={{fontSize:12,color:C.stone,...F}}>Her satır: Görev adı | Saat | Bölüm | Kullanım notu</div></div><button onClick={()=>{setProgramAdding(false);setProgramEditing(null);setCustomProgram({name:"",desc:"",duration:"30 gün",tasks:"",productVideo:null});}} style={{border:"none",background:C.foam,borderRadius:12,padding:"8px 12px",color:C.stone,...F}}>Kapat</button></div>{[["name","Program adı"],["desc","Açıklama"],["duration","Süre"]].map(([k,l])=><div key={k} style={{marginBottom:8}}><div style={{fontSize:11,fontWeight:800,color:C.ink,marginBottom:5,...F}}>{l}</div><input value={customProgram[k]} onChange={e=>setCustomProgram(p=>({...p,[k]:e.target.value}))} style={{width:"100%",boxSizing:"border-box",border:`1.5px solid ${C.mint}`,borderRadius:12,padding:"10px",fontSize:13,color:C.ink,...F}}/></div>)}<div style={{fontSize:11,fontWeight:800,color:C.ink,marginBottom:5,...F}}>Program videosu</div><input ref={programVideoRef} type="file" accept="video/*" onChange={saveProgramVideo} style={{display:"none"}}/><button onClick={()=>programVideoRef.current?.click()} style={{width:"100%",border:"none",background:customProgram.productVideo?C.mint:C.foam,color:customProgram.productVideo?C.emerald:C.stone,borderRadius:12,padding:"10px",fontSize:12,fontWeight:800,marginBottom:10,...F}}>{customProgram.productVideo?`Video eklendi: ${customProgram.productVideo.name}`:"Video Ekle"}</button><div style={{fontSize:11,fontWeight:800,color:C.ink,marginBottom:5,...F}}>Görev satırları</div><textarea value={customProgram.tasks} onChange={e=>setCustomProgram(p=>({...p,tasks:e.target.value}))} placeholder={"Sabah karışımı | 07:15 | Kahvaltı | 500 ml suya 4 kapak Aloe Vera\nÖğle yemeği | 12:30 | Ana Öğün | Protein, karbonhidrat ve lif dengeli tabak"} style={{width:"100%",boxSizing:"border-box",minHeight:150,border:`1.5px solid ${C.mint}`,borderRadius:12,padding:10,fontSize:12,color:C.ink,outline:"none",...F}}/><button onClick={createCustomProgram} style={{width:"100%",border:"none",background:C.emerald,color:C.white,borderRadius:15,padding:"13px",fontWeight:800,marginTop:12,...F}}>{programEditing?"Değişiklikleri Kaydet":"Programı Kaydet"}</button></div></div>}
         <Card style={{padding:"18px",marginBottom:14,background:coverBg(user)}}><div style={{display:"flex",gap:16,alignItems:"center"}}><Avatar user={user} size={86} bg="rgba(255,255,255,.28)" fg={C.white}/><div style={{flex:1,minWidth:0}}><div style={{fontSize:21,fontWeight:900,color:C.white,...F}}>{user.name}</div><div style={{fontSize:12,color:"rgba(255,255,255,.78)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:"100%",...F}}>{user.email}</div>{isCoach&&<div style={{fontSize:12,color:C.gold,marginTop:6,fontWeight:800,...F}}>Ref: {user.refCode}</div>}</div><input ref={photoRef} type="file" accept="image/*" onChange={changePhoto} style={{display:"none"}}/><button disabled={!isCoach&&user.profilePhotoLocked} onClick={()=>photoRef.current?.click()} style={{border:"none",background:(!isCoach&&user.profilePhotoLocked)?"rgba(255,255,255,.12)":C.white,color:(!isCoach&&user.profilePhotoLocked)?"rgba(255,255,255,.45)":C.emerald,borderRadius:12,padding:"8px 10px",fontSize:11,fontWeight:800,flexShrink:0,...F}}>{!isCoach&&user.profilePhotoLocked?"Kilitli":"Foto"}</button></div>{!isCoach&&user.profilePhotoLocked&&<div style={{fontSize:11,color:"rgba(255,255,255,.72)",marginTop:10,...F}}>Profil fotoğrafı bir kere değiştirildi.</div>}</Card>
+        {isCoach?(
+          <Card style={{padding:"16px",marginBottom:14}}>
+            <div style={{fontSize:11,color:C.emerald,fontWeight:950,letterSpacing:.6,marginBottom:10,...F}}>V2 KOÇ PROFİLİ</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
+              {[{l:"Danışan",v:clients.length,c:C.emerald},{l:"Program",v:allPrograms(user.id).length,c:C.blue},{l:"Onay",v:coachProofActions(user.id,DB.users()).length,c:C.warn}].map(x=><div key={x.l} style={{background:C.foam,borderRadius:15,padding:"11px",textAlign:"center"}}><div style={{fontSize:18,fontWeight:950,color:x.c,lineHeight:1,...F}}>{x.v}</div><div style={{fontSize:10,color:C.stone,fontWeight:850,marginTop:5,...F}}>{x.l}</div></div>)}
+            </div>
+            <div style={{fontSize:12,color:C.ink,fontWeight:800,lineHeight:1.4,marginTop:12,...F}}>Bu profil alanı koçun V2 çalışma merkezi olarak kullanılacak: program kataloğu, ürün videoları, danışan yönetimi ve güvenlik ayarları aynı yerden yönetilir.</div>
+          </Card>
+        ):(
+          <Card style={{padding:"16px",marginBottom:14}}>
+            <div style={{fontSize:11,color:C.emerald,fontWeight:950,letterSpacing:.6,marginBottom:10,...F}}>V2 WELLNESS PROFİLİ</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
+              {[{l:"Program",v:displayProgram(user),c:C.emerald},{l:"Hedef",v:dashboardWeightText(user.body?.target),c:C.blue},{l:"Seri",v:`${user.streakDays||0} gün`,c:C.warn}].map(x=><div key={x.l} style={{background:C.foam,borderRadius:15,padding:"11px",minHeight:58}}><div style={{fontSize:10,color:C.stone,fontWeight:850,marginBottom:5,...F}}>{x.l}</div><div style={{fontSize:13,fontWeight:950,color:x.c,lineHeight:1.15,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",...F}}>{x.v}</div></div>)}
+            </div>
+            <div style={{fontSize:12,color:C.ink,fontWeight:800,lineHeight:1.4,marginTop:12,...F}}>Profilin artık sadece ayar değil; hedef, program, ölçüm ve güvenlik merkezidir. Program atanınca saat tercihleri ve alarm izinleri buradan yönetilir.</div>
+          </Card>
+        )}
         <Card style={{padding:"16px",marginBottom:14}}><div style={{fontSize:14,fontWeight:800,color:C.ink,marginBottom:10,...F}}>Arka Plan</div><div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:8}}>{COVER_THEMES.map((bg,i)=><button key={i} onClick={()=>changeCover(bg)} style={{height:42,borderRadius:14,border:coverBg(user)===bg?`3px solid ${C.emerald}`:`2px solid ${C.white}`,background:bg,boxShadow:"0 4px 12px rgba(13,61,43,.12)",cursor:"pointer"}}/>)}</div></Card>
         <Card style={{padding:"16px",marginBottom:14}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}><div style={{fontSize:14,fontWeight:800,color:C.ink,...F}}>Profil Bilgileri</div><button onClick={()=>editing?saveProfile():setEditing(true)} style={{border:"none",background:editing?C.emerald:C.foam,color:editing?C.white:C.emerald,borderRadius:12,padding:"8px 12px",fontWeight:800,...F}}>{editing?"Kaydet":"Düzenle"}</button></div>{pref("name","Ad soyad",form.name,v=>setForm(f=>({...f,name:v})))}{pref("email","E-posta",form.email,v=>setForm(f=>({...f,email:v})))}{pref("phone","Telefon",form.phone,v=>setForm(f=>({...f,phone:v})))}</Card>
         {isCoach&&<><input ref={rowVideoRef} type="file" accept="video/*" onChange={saveProgramRowVideo} style={{display:"none"}}/><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>{[{l:"Danışan",v:clients.length,c:C.emerald},{l:"Program",v:activePrograms.length,c:C.blue},{l:"Yasaklı",v:banned.length,c:C.risk},{l:"Fotoğraf",v:clients.reduce((a,c)=>a+(c.photoPendingToday||0),0),c:C.warn}].map(x=><Card key={x.l} style={{padding:"14px"}}><div style={{fontSize:10,color:C.stone,marginBottom:4,...F}}>{x.l}</div><div style={{fontSize:24,fontWeight:800,color:x.c,...F}}>{x.v}</div></Card>)}</div><Card style={{padding:"16px",marginBottom:14}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}><div style={{fontSize:14,fontWeight:800,color:C.ink,...F}}>Kayıtlı Programlar</div><button onClick={()=>{setProgramEditing(null);setCustomProgram({name:"",desc:"",duration:"30 gün",tasks:"",productVideo:null});setProgramAdding(true);}} style={{border:"none",background:C.mint,color:C.emerald,borderRadius:10,padding:"7px 10px",fontSize:11,fontWeight:800,...F}}>+ Program</button></div>{allPrograms(user.id).map(t=><div key={t.id} style={{padding:"10px 0",borderBottom:`1px solid ${C.foam}`}}><div style={{display:"flex",justifyContent:"space-between",gap:8,alignItems:"center"}}><b style={{fontSize:13,color:C.ink,...F}}>{t.name}</b><span style={{fontSize:11,color:t.coachId?C.blue:C.stone,...F}}>{t.coachId?"Özel":t.duration}</span></div><div style={{fontSize:11,color:C.stone,marginTop:4,...F}}>{t.desc}</div>{t.productVideo&&<div style={{fontSize:10,color:C.emerald,fontWeight:800,marginTop:5,...F}}>Video kayıtlı: {t.productVideo.name||"ürün videosu"}</div>}<div style={{display:"flex",gap:8,marginTop:9,flexWrap:"wrap"}}><button onClick={()=>editCustomProgram(t)} style={{border:"none",background:C.blueBg,color:C.blue,borderRadius:10,padding:"7px 10px",fontSize:11,fontWeight:900,...F}}>Düzenle</button><button onClick={()=>{setVideoProgram(t);setTimeout(()=>rowVideoRef.current?.click(),0);}} style={{border:"none",background:C.mint,color:C.emerald,borderRadius:10,padding:"7px 10px",fontSize:11,fontWeight:900,...F}}>Video Ekle</button><button onClick={()=>removeProgram(t)} style={{border:"none",background:"#fde8e6",color:C.risk,borderRadius:10,padding:"7px 10px",fontSize:11,fontWeight:900,...F}}>Sil</button></div></div>)}</Card><Card style={{padding:"16px",marginBottom:14}}><div style={{fontSize:14,fontWeight:800,color:C.ink,marginBottom:10,...F}}>Ürün Kullanım Videoları</div>{productVideos.length===0?<div style={{fontSize:12,color:C.stone,...F}}>Henüz kayıtlı ürün videosu yok.</div>:productVideos.map(({client:c,video:v},i)=><div key={(v.mediaId||c.id)+i} style={{padding:"10px 0",borderBottom:`1px solid ${C.foam}`}}><div style={{display:"flex",justifyContent:"space-between",gap:8}}><b style={{fontSize:13,color:C.ink,...F}}>{v.name||"Ürün videosu"}</b><Pill bg={videoActive(v)&&c.productVideo?.mediaId===v.mediaId?C.mint:C.foam} color={videoActive(v)&&c.productVideo?.mediaId===v.mediaId?C.emerald:C.stone}>{videoActive(v)&&c.productVideo?.mediaId===v.mediaId?"Danışanda aktif":"Taslak"}</Pill></div><div style={{fontSize:11,color:C.stone,marginTop:4,...F}}>{c.name} · {displayProgram(c)} · {v.assignedAt}</div></div>)}</Card><Card style={{padding:"16px",marginBottom:14,border:banned.length?`1.5px solid #ffd4d0`:undefined}}><div style={{fontSize:14,fontWeight:800,color:C.ink,marginBottom:10,...F}}>Yasaklı Liste</div>{banned.length===0?<div style={{fontSize:12,color:C.stone,...F}}>Yasaklı danışan yok.</div>:banned.map(c=><div key={c.id} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:`1px solid ${C.foam}`}}><Av ini={ini(c.name)} size={34} bg="#fde8e6" fg={C.risk}/><div style={{flex:1}}><div style={{fontSize:13,fontWeight:800,color:C.ink,...F}}>{c.name}</div><div style={{fontSize:11,color:C.stone,...F}}>{c.email}</div></div><button onClick={()=>unban(c.id)} style={{border:"none",background:C.mint,color:C.emerald,borderRadius:10,padding:"7px 10px",fontWeight:800,fontSize:11,...F}}>Aktifleştir</button></div>)}</Card></>}
@@ -2230,7 +2445,6 @@ export default function App() {
   if(user?.role==="admin") return <>{showSplash&&<StepWiseSplash/>}{isMobileAdmin?<AdminMobilePanel admin={user} onLogout={logout}/>:<AdminPanel admin={user} onLogout={logout}/>}</>;
 
   const messageBadge=unreadMessageBadge(user,allUsers);
-
   const coachTabs=[
     {id:"home",icon:IC.home,label:"Özet"},
     {id:"clients",icon:IC.clients,label:"Danışanlar"},
@@ -2267,7 +2481,7 @@ export default function App() {
       if(tab==="home") return <ClientHome user={user} onNav={setTab} allUsers={allUsers}/>;
       if(tab==="tasks") return <ClientTasks user={user} onUpdate={updateUser}/>;
       if(tab==="calendar") return <ClientCal user={user} allUsers={allUsers}/>;
-      if(tab==="progress") return <ClientProgress user={user} allUsers={allUsers}/>;
+      if(tab==="progress") return <ClientProgress user={user} allUsers={allUsers} onUpdate={updateUser}/>;
       if(tab==="messages") return <ClientMsgs user={user} allUsers={allUsers}/>;
       if(tab==="profile") return <ProfileScreen user={user} allUsers={allUsers} onUpdate={(u)=>{u&&setUser(u);refresh();}} onLogout={logout}/>;
       return <ClientHome user={user} onNav={setTab} allUsers={allUsers}/>;

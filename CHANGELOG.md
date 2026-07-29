@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Wellness V2 dashboard temeli health score, AI onizleme, su/beslenme/aktivite ve olcum servisleriyle baglandi.
+
 - Gunluk gorev kuyrugu kalan/tamamlanan/siradaki gorev modelini merkezi hale getirdi.
 
 - Koc aksiyon kutusu mesajlardan ayrilabilecek includeMessages filtresiyle guvenceye alindi.

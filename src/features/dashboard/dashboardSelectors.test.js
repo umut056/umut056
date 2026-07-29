@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { getCoachDashboardSummary, getClientDashboardSummary } from "./dashboardSelectors.js";
+import {
+  getCoachDashboardSummary,
+  getCoachV2Snapshot,
+  getClientDashboardSummary,
+  getClientWellnessSnapshot,
+} from "./dashboardSelectors.js";
 
 describe("dashboardSelectors", () => {
   it("summarizes coach clients and active work", () => {
@@ -42,5 +47,47 @@ describe("dashboardSelectors", () => {
     expect(summary.delta).toBe(4.5);
     expect(summary.deltaLabel).toBe("4.5");
   });
-});
 
+  it("derives a V2 wellness snapshot from existing client data", () => {
+    const snapshot = getClientWellnessSnapshot({
+      client: {
+        compliance: 80,
+        streakDays: 5,
+        body: { start: 72, current: 67.5, target: 63, water: 52 },
+      },
+      taskPlan: [{ title: "A" }, { title: "B" }],
+      dailyState: { tasks: [true, false] },
+    });
+
+    expect(snapshot.healthScore).toBeGreaterThan(0);
+    expect(snapshot.modules.map((module) => module.id)).toEqual([
+      "nutrition",
+      "water",
+      "activity",
+      "progress",
+    ]);
+    expect(snapshot.actionCards.map((card) => card.id)).toEqual([
+      "ai-coach",
+      "nutrition",
+      "body",
+      "hydration",
+      "activity",
+      "products",
+    ]);
+    expect(snapshot.aiInsight).toContain("Bugün");
+  });
+
+  it("derives a V2 coach command snapshot from existing coach summary data", () => {
+    const snapshot = getCoachV2Snapshot({
+      clients: [{ id: "client-1", name: "Elif Yılmaz" }],
+      avg: 73,
+      activeTasks: 10,
+      proofActions: [{ id: "proof-1" }],
+      riskClients: [],
+    });
+
+    expect(snapshot.healthScore).toBeGreaterThan(0);
+    expect(snapshot.focusItems).toHaveLength(3);
+    expect(snapshot.proofLoad).toBe(1);
+  });
+});
