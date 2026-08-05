@@ -72,6 +72,30 @@ export function unreadMessageBadge(messages = [], userId, participants = []) {
   };
 }
 
+export function unreadConversationHeadline(summaries = [], totalOverride = null) {
+  const total = Number.isFinite(totalOverride)
+    ? totalOverride
+    : summaries.reduce((count, summary) => count + summary.count, 0);
+  if (total <= 0 || summaries.length === 0) return "";
+
+  if (summaries.length === 1) {
+    const summary = summaries[0];
+    return `${summary.senderName || "Danışan"} · ${summary.count} yeni mesaj`;
+  }
+
+  return `${summaries.length} danışandan ${total} yeni mesaj`;
+}
+
+export function unreadConversationDetail(summaries = []) {
+  if (summaries.length === 0) return "";
+  if (summaries.length === 1) return summaries[0].lastText || "Mesaj";
+
+  return summaries
+    .slice(0, 3)
+    .map((summary) => `${summary.senderName || "Danışan"} (${summary.count})`)
+    .join(" · ");
+}
+
 export function coachActionInbox({
   coachId,
   users = [],

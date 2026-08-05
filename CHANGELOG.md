@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Mesaj ekraninda okunmamis gonderen/adet ozeti netlestirildi; koc bir veya birden fazla danisandan gelen mesaj sayisini listede gorebilir.
+
 - Oturum restore guard, profil hedef kilo ve koç rapor kilo satırları eksik veriyle beyaz ekran/undefined üretmeyecek şekilde güçlendirildi.
 
 - Gorev fotograf dili temizlendi; Android native alarm tekrar bildirimi donusumlu ID ile guclendirildi.

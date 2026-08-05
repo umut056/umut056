@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   coachActionInbox,
   markMessagesRead,
+  unreadConversationDetail,
+  unreadConversationHeadline,
   unreadConversationSummaries,
   unreadCount,
   unreadCountFrom,
@@ -74,6 +76,24 @@ describe("notificationService unread messages", () => {
       topSenderName: "Mert Demir",
       label: "Mert Demir: 2",
     });
+  });
+
+  it("formats unread conversation headline and detail with sender counts", () => {
+    const summaries = unreadConversationSummaries(
+      messages,
+      "coach-1",
+      [
+        { id: "client-1", name: "Mert Demir" },
+        { id: "client-2", name: "Elif Yilmaz" },
+      ],
+      (message) => (message.kind === "audio" ? "Sesli mesaj" : message.text || "Mesaj"),
+    );
+
+    expect(unreadConversationHeadline(summaries)).toBe("2 danışandan 3 yeni mesaj");
+    expect(unreadConversationDetail(summaries)).toBe("Mert Demir (2) · Elif Yilmaz (1)");
+
+    expect(unreadConversationHeadline([summaries[0]])).toBe("Mert Demir · 2 yeni mesaj");
+    expect(unreadConversationDetail([summaries[0]])).toBe("Kontrol eder misin?");
   });
 
   it("marks unread messages read without touching other conversations", () => {
