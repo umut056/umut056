@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Danisan oturumu acildiginda gorev sekmesine girilmese bile bugunun aktif gorev alarmlari native Android katmanina otomatik yazilir.
+
 - Mesaj ekraninda okunmamis gonderen/adet ozeti netlestirildi; koc bir veya birden fazla danisandan gelen mesaj sayisini listede gorebilir.
 
 - Oturum restore guard, profil hedef kilo ve koç rapor kilo satırları eksik veriyle beyaz ekran/undefined üretmeyecek şekilde güçlendirildi.

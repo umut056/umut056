@@ -2431,6 +2431,28 @@ export default function App() {
     return()=>{cancelled=true;};
   },[user?.id,user?.supabaseToken]);
 
+  const clientAlarmSignature=user?.role==="client"?JSON.stringify({
+    id:user.id,
+    programTemplateId:user.programTemplateId,
+    programName:user.programName,
+    programStartDate:user.programStartDate,
+    programEndDate:user.programEndDate,
+    tasks:user.tasks||[],
+    snoozedTasks:user.snoozedTasks||{},
+    schedulePrefs:user.schedulePrefs?.taskTimes||{},
+  }):"";
+
+  useEffect(()=>{
+    if(user?.role!=="client")return;
+    const tasks=currentClientTasks(user);
+    if(!tasks.length){
+      cancelAllNativeAlarms();
+      return;
+    }
+    const day=dailyStateFor(user,tasks);
+    scheduleNativeAlarms(tasks,day.tasks||[],day.snoozedTasks||{});
+  },[user?.id,user?.role,clientAlarmSignature]);
+
   const refresh=()=>setAllUsers(DB.users());
   const login=async(u)=>{
     let activeUser=u;
