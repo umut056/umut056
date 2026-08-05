@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Android arka plandan donuste aktif oturum ve danisan gorev alarmlari native katmana yeniden bildirilecek sekilde guclendirildi.
+
 - Danisan oturumu acildiginda gorev sekmesine girilmese bile bugunun aktif gorev alarmlari native Android katmanina otomatik yazilir.
 
 - Mesaj ekraninda okunmamis gonderen/adet ozeti netlestirildi; koc bir veya birden fazla danisandan gelen mesaj sayisini listede gorebilir.
