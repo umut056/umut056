@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Yeni gun rollover kontrolu eklendi; danisan gorev ve alarm plani gece acik kalan uygulamada da yeni tarihe gore tazelenir.
+
 - Android arka plandan donuste aktif oturum ve danisan gorev alarmlari native katmana yeniden bildirilecek sekilde guclendirildi.
 
 - Danisan oturumu acildiginda gorev sekmesine girilmese bile bugunun aktif gorev alarmlari native Android katmanina otomatik yazilir.

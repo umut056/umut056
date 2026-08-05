@@ -2361,6 +2361,7 @@ export default function App() {
   const [allUsers,setAllUsers]=useState([]);
   const [isMobileAdmin,setIsMobileAdmin]=useState(()=>typeof window!=="undefined"&&window.innerWidth<720);
   const [showSplash,setShowSplash]=useState(true);
+  const [appDate,setAppDate]=useState(()=>todayKey());
   const lastCloudMsgIds=useRef(new Set());
 
   useEffect(()=>{
@@ -2371,6 +2372,12 @@ export default function App() {
   },[]);
   useEffect(()=>{const onResize=()=>setIsMobileAdmin(window.innerWidth<720);window.addEventListener("resize",onResize);return()=>window.removeEventListener("resize",onResize);},[]);
   useEffect(()=>{const t=setTimeout(()=>setShowSplash(false),3200);return()=>clearTimeout(t);},[]);
+  useEffect(()=>{
+    const syncDate=()=>setAppDate(current=>{const next=todayKey();return current===next?current:next;});
+    syncDate();
+    const id=setInterval(syncDate,60000);
+    return()=>clearInterval(id);
+  },[]);
 
   const applyProductionWorkspace=(workspace,currentUser=user,{notify=false}={})=>{
     if(!workspace?.users?.length)return currentUser;
@@ -2433,6 +2440,7 @@ export default function App() {
 
   const clientAlarmSignature=user?.role==="client"?JSON.stringify({
     id:user.id,
+    date:appDate,
     programTemplateId:user.programTemplateId,
     programName:user.programName,
     programStartDate:user.programStartDate,
@@ -2449,9 +2457,9 @@ export default function App() {
       cancelAllNativeAlarms();
       return;
     }
-    const day=dailyStateFor(user,tasks);
+    const day=dailyStateFor(user,tasks,appDate);
     scheduleNativeAlarms(tasks,day.tasks||[],day.snoozedTasks||{});
-  },[user?.id,user?.role,clientAlarmSignature]);
+  },[user?.id,user?.role,clientAlarmSignature,appDate]);
 
   useEffect(()=>{
     if(!user?.id)return;
@@ -2460,7 +2468,7 @@ export default function App() {
       if(user.role!=="client")return;
       const tasks=currentClientTasks(user);
       if(!tasks.length)return;
-      const day=dailyStateFor(user,tasks);
+      const day=dailyStateFor(user,tasks,appDate);
       scheduleNativeAlarms(tasks,day.tasks||[],day.snoozedTasks||{});
     };
     const onVisibility=()=>{
@@ -2473,7 +2481,7 @@ export default function App() {
       window.removeEventListener("focus",reassertNativeSession);
       document.removeEventListener("visibilitychange",onVisibility);
     };
-  },[user?.id,user?.role,clientAlarmSignature]);
+  },[user?.id,user?.role,clientAlarmSignature,appDate]);
 
   const refresh=()=>setAllUsers(DB.users());
   const login=async(u)=>{
